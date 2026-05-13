@@ -41,3 +41,23 @@ func Test_uses_sdram_cache(t *testing.T) {
 		t.Fatal("Expected cache-lane usage to be detected")
 	}
 }
+
+func Test_disable_credits_for_pocket_target(t *testing.T) {
+	MakeFromMap(map[string]string{JTFRAME_CREDITS: "1"})
+
+	disable_credits_for_target("pocket")
+
+	if IsSet(JTFRAME_CREDITS) {
+		t.Fatal("Pocket target should not keep JTFRAME credits enabled")
+	}
+}
+
+func Test_disable_credits_keeps_other_targets(t *testing.T) {
+	MakeFromMap(map[string]string{JTFRAME_CREDITS: "1"})
+
+	disable_credits_for_target("mister")
+
+	if !IsSet(JTFRAME_CREDITS) {
+		t.Fatal("non-Pocket targets should keep JTFRAME credits enabled")
+	}
+}

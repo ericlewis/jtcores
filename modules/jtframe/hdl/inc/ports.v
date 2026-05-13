@@ -32,8 +32,10 @@
 `endif
     input   [ 7:0]  prog_data,
     input           prog_we,
+    input           prog_rdy,
     input   [ 1:0]  prog_ba,
     input   [25:0]  ioctl_addr,
+    input           ioctl_rom,
     input           prom_we,
 {{- if .Download.Post_addr }}
 `ifdef JTFRAME_SDRAM_LARGE
@@ -47,6 +49,15 @@
 {{end}}
 {{- if .Download.Post_data }}
     output reg [ 7:0] post_data,
+{{end}}
+{{- if .Download.Post_ba }}
+    output reg [ 1:0] post_ba,
+{{end}}
+{{- if .Download.Post_mask }}
+    output reg [ 1:0] post_mask,
+{{end}}
+{{- if .Download.Post_we }}
+    output reg        post_we,
 {{end}}
 `ifdef JTFRAME_HEADER
     input           header,

@@ -29,7 +29,7 @@ func dump_qip(all []string) error {
 		}
 		aux := "set_global_assignment -name " + filetype
 		if args.Rel {
-			aux = aux + "[file join $::quartus(qip_path) " + each + "]"
+			aux = aux + " [file join $::quartus(qip_path) " + each + "]"
 		} else {
 			aux = aux + " " + each
 		}

@@ -29,3 +29,6 @@ NOFIR
 
 [mister|pocket]
 JTFRAME_CREDITS_NOROTATE
+
+[pocket]
+GAMETOP=jtcps2_game_sdram

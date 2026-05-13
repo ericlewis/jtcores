@@ -9,7 +9,6 @@ runscript=`mktemp`
 cat <<EOF > $runscript
 export PATH=$PATH:/usr/local/go/bin:/opt/altera/13.1/quartus/bin
 git config --global --add safe.directory /jtcores
-git config --global --add safe.directory /jtcores/modules/jtframe/target/pocket
 cd jtcores
 ./setprj.sh
 jtframe

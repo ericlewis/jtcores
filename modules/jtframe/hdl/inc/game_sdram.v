@@ -77,11 +77,13 @@ wire [{{ sub (byte_en_width .Data_width) 1 }}:0] {{.Name}}_dsn;
 {{- end}}
 {{- end}}
 wire        prom_we, header;
+wire        raw_we, post_we;
 wire [SDRAMW-2:0] raw_addr, post_addr;
 wire [SDRAMW-2:0] ioctl_prog_addr   = ioctl_addr[SDRAMW-2:0];
 wire [25:0] pre_addr, dwnld_addr, ioctl_addr_noheader;
 wire [ 7:0] post_data;
 wire [15:0] raw_data;
+wire [ 1:0] raw_ba, post_ba, raw_mask, post_mask;
 wire [ 7:0] pcb_id;
 wire        pass_io;
 {{ if .Clocks }}// Clock enable signals{{ end }}
@@ -249,11 +251,13 @@ jt{{if .Game}}{{.Game}}{{else}}{{.Core}}{{end}}_game u_game(
     .sav_addr   ( sav_addr      ),
 `endif
     // PROM writting
-    .ioctl_addr   ( pass_io ? ioctl_addr       : ioctl_addr_noheader  ),
+    .ioctl_addr   ( {{if .Download.Raw_ioctl_addr }}ioctl_addr{{else}}pass_io ? ioctl_addr       : ioctl_addr_noheader{{end}}  ),
     .prog_addr    ( pass_io ? ioctl_prog_addr : raw_addr      ),
     .prog_data    ( pass_io ? ioctl_dout       : raw_data[7:0] ),
-    .prog_we      ( pass_io ? ioctl_wr         : prog_we       ),
-    .prog_ba      ( prog_ba        ), // prog_ba supplied in case it helps re-mapping addresses
+    .prog_we      ( pass_io ? ioctl_wr         : raw_we        ),
+    .prog_rdy     ( prog_rdy       ),
+    .prog_ba      ( raw_ba         ), // raw_ba supplied in case it helps re-mapping addresses
+    .ioctl_rom    ( ioctl_rom      ),
     .prom_we      ( pass_io ? 1'b0 : prom_we ),
     {{- with .Download.Pre_addr }}
     // SDRAM address mapper during downloading
@@ -265,6 +269,15 @@ jt{{if .Game}}{{.Game}}{{else}}{{.Core}}{{end}}_game u_game(
     {{- end }}
     {{- with .Download.Post_data }}
     .post_data    ( post_data      ),
+    {{- end }}
+    {{- with .Download.Post_ba }}
+    .post_ba      ( post_ba        ),
+    {{- end }}
+    {{- with .Download.Post_mask }}
+    .post_mask    ( post_mask      ),
+    {{- end }}
+    {{- with .Download.Post_we }}
+    .post_we      ( post_we        ),
     {{- end }}
 `ifdef JTFRAME_HEADER
     .header       ( header         ),
@@ -303,6 +316,9 @@ assign dwnld_busy = ioctl_rom | prom_we; // prom_we is really just for sims
 assign dwnld_addr = {{if .Download.Pre_addr }}pre_addr{{else}}ioctl_addr{{end}};
 assign prog_addr = {{if .Download.Post_addr }}post_addr{{else}}raw_addr{{end}};
 assign prog_data = {{if .Download.Post_data }}{2{post_data}}{{else}}raw_data{{end}};
+assign prog_ba   = {{if .Download.Post_ba }}post_ba{{else}}raw_ba{{end}};
+assign prog_mask = {{if .Download.Post_mask }}post_mask{{else}}raw_mask{{end}};
+assign prog_we   = {{if .Download.Post_we }}post_we{{else}}(pass_io ? ioctl_wr : raw_we){{end}};
 assign gfx4_en   = {{ .Gfx4 }}
 assign gfx8_en   = {{ .Gfx8 }}
 assign gfx16_en  = {{ .Gfx16 }}
@@ -346,10 +362,10 @@ jtframe_dwnld #(
     .gfx16c_en    ( gfx16c_en      ),
     .prog_addr    ( raw_addr       ),
     .prog_data    ( raw_data       ),
-    .prog_mask    ( prog_mask      ), // active low
-    .prog_we      ( prog_we        ),
+    .prog_mask    ( raw_mask       ), // active low
+    .prog_we      ( raw_we         ),
     .prog_rd      ( prog_rd        ),
-    .prog_ba      ( prog_ba        ),
+    .prog_ba      ( raw_ba         ),
     .prom_we      ( prom_we        ),
     .header       ( header         ),
     .sdram_ack    ( prog_ack       )
@@ -427,9 +443,9 @@ jtframe_{{.MemType}}_{{len .Buses}}slot{{with lt 1 (len .Buses)}}s{{end}} #(
     {{- if .Rw }}{{ with .Dont_erase }}
     .SLOT{{$index}}_ERASE(0),{{end}}
     {{- else}}{{- with .Offset }}
-    .SLOT{{$index}}_OFFSET({{.}}[SDRAMW-2:0]),{{end}}{{end}}
-    {{- if not .Rw }}{{- with .Latch }}
-    .SLOT{{$index}}_LATCH({{.}}),{{end}}{{end}}
+    .SLOT{{$index}}_OFFSET({{.}}[SDRAMW-2:0]),{{end}}{{- with .Latch }}
+    .SLOT{{$index}}_LATCH({{.}}),{{end}}{{- with .Double }}
+    .SLOT{{$index}}_DOUBLE({{.}}),{{end}}{{end}}
     {{- with .Cache_size }}
     .CACHE{{$index}}_SIZE({{.}}),{{end}}
     .SLOT{{$index}}_AW({{ slot_addr_width . }}),
@@ -437,7 +453,7 @@ jtframe_{{.MemType}}_{{len .Buses}}slot{{with lt 1 (len .Buses)}}s{{end}} #(
 {{- end}}
 `ifdef JTFRAME_BA{{$bank}}_LEN
 {{- range $index, $each:=.Buses}}
-{{- if not .Rw}}
+{{- if and (not .Rw) (not .Double)}}
     ,.SLOT{{$index}}_DOUBLE(1){{ end }}
 {{- end}}
 `endif
@@ -463,7 +479,7 @@ jtframe_{{.MemType}}_{{len .Buses}}slot{{with lt 1 (len .Buses)}}s{{end}} #(
     .slot{{$index2}}_offset( {{if .Offset }}{{.Offset}}[SDRAMW-2:0]{{else}}{(SDRAMW-1){1'b0}}{{end}} ),
     {{- else }}
     {{- if not $is_rom }}
-    .slot{{$index2}}_clr   ( 1'b0       ), // only 1'b0 supported in mem.yaml
+    .slot{{$index2}}_clr   ( {{if .Clr}}{{.Clr}}{{else}}1'b0{{end}}       ),
     {{- end }}{{- end}}
     .slot{{$index2}}_dout  ( {{.Name}}_data  ),
     .slot{{$index2}}_cs    ( {{ if .Cs }}{{.Cs}}{{else}}{{.Name}}_cs{{end}}    ),

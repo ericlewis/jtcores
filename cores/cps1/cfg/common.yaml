@@ -12,6 +12,7 @@ cps1:
     - jtcps1_obj_draw.v
     - jtcps1_obj_line.v
     - jtcps1_prom_we.v
+    - jtcps1_memgen.v
     - jtcps1_stars.v
     - jtcps1_gfx_mappers.v
     - jtcps1_cpucen.v

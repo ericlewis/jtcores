@@ -28,7 +28,7 @@ module jts18_video(
 
     // video configuration
     input              flip,
-    inout              ext_flip,
+    input              ext_flip,
     input              vdp_en,
     input              vid16_en,
     input              gray_n,

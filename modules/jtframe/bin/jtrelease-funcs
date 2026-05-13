@@ -102,8 +102,6 @@ clone_repo() {
 	git checkout $hash
 	source setprj.sh
 	cd $path
-	git submodule init $JTFRAME/target/pocket
-	git submodule update --depth 1 $JTFRAME/target/pocket
 	git submodule init modules/jt51
 	git submodule update --depth 1 modules/jt51
 }

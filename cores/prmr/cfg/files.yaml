@@ -17,3 +17,4 @@ jtframe:
     - jtframe_toggle.v
     - jtframe_8bit_reg.v
 jt539:
+  - unless: [NOSOUND]

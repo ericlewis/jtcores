@@ -1,0 +1,3 @@
+include:
+  - core: cps1
+    file: mem.yaml

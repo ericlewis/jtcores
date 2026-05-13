@@ -150,7 +150,13 @@ localparam
 `else
     BA3_LEN                 = 32,
 `endif
+`ifdef JTFRAME_POCKET_PROG_SINGLE_BEAT
+    // Pocket uses SDRAM bursts for normal ROM reads, but download writes must
+    // only program the addressed word.
+    PROG_LEN = 16,
+`else
     PROG_LEN = 32,
+`endif
 `ifdef JTFRAME_SDRAM96
     HF = 1;
 `else

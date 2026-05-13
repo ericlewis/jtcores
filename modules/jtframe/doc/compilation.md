@@ -11,7 +11,7 @@ All JT arcade cores depend on JTFRAME for compilation. You need to follow the jt
 
 For parallel compilation across network machines, create a file `$HOME/.parallel/sshloginfile` with one host name per line. Configure SSH correctly across the machines, using `ssh-copy-id`, etc.
 
-JTFRAME uses a submodule to give support to the *Analogue Pocket* target. This submodule is not open source and you will get an error if you try to initialize it. You can safely ignore this submodule, it is only needed to create Pocket files.
+JTFRAME now includes a public first-pass *Analogue Pocket* target scaffold in `modules/jtframe/target/pocket`. It restores the normal JTFRAME target layout and Pocket metadata generation hooks, but the APF shell and data-slot bridge are still scaffolding and need more work before the target is production-ready.
 
 ## Quick Steps
 

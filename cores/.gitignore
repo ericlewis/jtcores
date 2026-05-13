@@ -1,4 +1,5 @@
 *.qsf
+!*/syn/pocket.qsf
 *.qpf
 *.f
 ref-*

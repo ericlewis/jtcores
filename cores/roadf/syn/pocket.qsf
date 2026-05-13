@@ -1,0 +1,3 @@
+# Pocket-only seed that closes the small generated-clock hold miss seen with
+# the default fitter seed.
+set_global_assignment -name SEED 2

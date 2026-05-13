@@ -70,9 +70,17 @@ reg [1:0]    good, hitl;
 reg          hit0, hit1;
 reg          dend, double, cache_ok;
 wire [AW-1:0] shifted;
+wire [AW-1:0] sdram_addr_req = addr_req>>(DW==8);
 
-assign sdram_addr = offset + { {SDRAMW-AW{1'b0}}, addr_req>>(DW==8)};
 assign data_ok    = cache_ok && {hit1,hit0}==hitl && (hit1 || hit0);
+
+generate
+    if( AW > SDRAMW ) begin : gen_trunc_addr
+        assign sdram_addr = offset + sdram_addr_req[SDRAMW-1:0];
+    end else begin : gen_pad_addr
+        assign sdram_addr = offset + { {SDRAMW-AW{1'b0}}, sdram_addr_req };
+    end
+endgenerate
 
 always @(*) begin
     case(DW)

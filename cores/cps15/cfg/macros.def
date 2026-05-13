@@ -19,3 +19,6 @@ NOFIR
 
 [sidi]
 JTFRAME_NOSTA
+
+[pocket]
+GAMETOP=jtcps15_game_sdram

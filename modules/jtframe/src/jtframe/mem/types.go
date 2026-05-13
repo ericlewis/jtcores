@@ -119,10 +119,14 @@ type BRAMBus_Ioctl struct {
 }
 
 type DownloadCfg struct {
-	Pre_addr  bool `yaml:"pre_addr"`  // Pass some signals to the game so it can remap the download address
-	Post_addr bool `yaml:"post_addr"` // Pass some signals to the game so it can remap the download address
-	Post_data bool `yaml:"post_data"` // Pass some signals to the game so it can remap the download data
-	Noswab    bool `yaml:"noswab"`    // SWAB parameter of jtframe_download
+	Pre_addr       bool `yaml:"pre_addr"`       // Pass some signals to the game so it can remap the download address
+	Post_addr      bool `yaml:"post_addr"`      // Pass some signals to the game so it can remap the download address
+	Post_data      bool `yaml:"post_data"`      // Pass some signals to the game so it can remap the download data
+	Post_ba        bool `yaml:"post_ba"`        // Pass the final SDRAM bank from the game after address remapping
+	Post_mask      bool `yaml:"post_mask"`      // Pass the final SDRAM byte mask from the game after address remapping
+	Post_we        bool `yaml:"post_we"`        // Pass the final SDRAM write strobe from the game after address remapping
+	Raw_ioctl_addr bool `yaml:"raw_ioctl_addr"` // Pass the original loader address to game-side download remappers
+	Noswab         bool `yaml:"noswab"`         // SWAB parameter of jtframe_download
 }
 
 type Include struct {
@@ -290,6 +294,8 @@ type SDRAMBus struct {
 	Dsn        string          `yaml:"dsn"` // optional name for dsn signal
 	Din        string          `yaml:"din"` // optional name for din signal
 	Cs         string          `yaml:"cs"`
+	Clr        string          `yaml:"clr"`
+	Double     string          `yaml:"double"`
 	Gfx        string          `yaml:"gfx_sort"`
 	Gfx_en     string          `yaml:"gfx_sort_en"`
 	Simfile    SDRAMBusSimfile `yaml:"simfile"`
@@ -462,6 +468,8 @@ func (bus *SDRAMBus) UnmarshalYAML(unmarshal func(interface{}) error) error {
 		Dsn        string          `yaml:"dsn"`
 		Din        string          `yaml:"din"`
 		Cs         string          `yaml:"cs"`
+		Clr        string          `yaml:"clr"`
+		Double     string          `yaml:"double"`
 		Gfx        string          `yaml:"gfx_sort"`
 		Gfx_en     string          `yaml:"gfx_sort_en"`
 		Simfile    SDRAMBusSimfile `yaml:"simfile"`
@@ -488,13 +496,17 @@ func (bus *SDRAMBus) UnmarshalYAML(unmarshal func(interface{}) error) error {
 	bus.Dsn = aux.Dsn
 	bus.Din = aux.Din
 	bus.Cs = aux.Cs
+	bus.Clr = aux.Clr
+	bus.Latch = aux.Latch
+	bus.Double = aux.Double
 	bus.Gfx = aux.Gfx
 	bus.Gfx_en = aux.Gfx_en
 	bus.Simfile = aux.Simfile
 	for key := range raw_map {
 		switch key {
-		case "when", "unless", "name", "offset", "latch", "addr", "addr_width", "data_width",
-			"cache_size", "rw", "do_not_erase", "dsn", "din", "cs", "gfx_sort",
+		case "when", "unless", "name", "offset", "addr", "addr_width", "data_width",
+			"cache_size", "rw", "do_not_erase", "dsn", "din", "cs", "clr", "latch",
+			"double", "gfx_sort",
 			"gfx_sort_en", "simfile":
 		default:
 			return fmt.Errorf("Unexpected field %s in SDRAM bus", key)

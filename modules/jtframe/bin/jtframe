@@ -6,14 +6,38 @@ if [ -z "$JTFRAME" ]; then
     exit 1
 fi
 
+JTFRAME_ABS="$(cd "$JTFRAME" && pwd)"
+JTFRAME_ORIG="$JTFRAME"
+JTROOT_ORIG="${JTROOT:-}"
+CORES_ORIG="${CORES:-}"
+MODULES_ORIG="${MODULES:-}"
+if [ -n "$JTROOT" ]; then
+    JTROOT_ABS="$(cd "$JTROOT" && pwd)"
+else
+    JTROOT_ABS="$(cd "$JTFRAME_ABS/../.." && pwd)"
+fi
+if [ -n "$CORES" ]; then
+    CORES_ABS="$(cd "$CORES" && pwd)"
+else
+    CORES_ABS="$JTROOT_ABS/cores"
+fi
+if [ -n "$MODULES" ]; then
+    MODULES_ABS="$(cd "$MODULES" && pwd)"
+else
+    MODULES_ABS="$JTROOT_ABS/modules"
+fi
+
 RECOMPILE=FALSE
-BIN=$JTFRAME/src/jtframe/jtframe
+BIN=$JTFRAME_ABS/src/jtframe/jtframe
 
 if [ ! -e $BIN ]; then
     RECOMPILE=TRUE
 else
     # Recompile if any source file is newer than the binary
-    NEWER=$(find $JTFRAME/src/jtframe -name '*.go' -newer $BIN 2>/dev/null)
+    NEWER=$(find $JTFRAME_ABS/src/jtframe -name '*.go' -newer $BIN 2>/dev/null)
+    if [ -e "$JTFRAME_ABS/target/pocket/pocket.go" ] && [ "$JTFRAME_ABS/target/pocket/pocket.go" -nt "$BIN" ]; then
+        NEWER=1
+    fi
     if [ -n "$NEWER" ]; then
         RECOMPILE=TRUE
     fi
@@ -30,15 +54,30 @@ function run_tests {
 }
 
 if [ $RECOMPILE = TRUE ]; then
-    if [ -e $JTFRAME/target/pocket/pocket.go ]; then
-        ln -sf $JTFRAME/target/pocket/pocket.go $JTFRAME/src/jtframe/mra/pocket.go
+    export JTFRAME="$JTFRAME_ABS"
+    export JTROOT="$JTROOT_ABS"
+    export CORES="$CORES_ABS"
+    export MODULES="$MODULES_ABS"
+    if [ -e $JTFRAME_ABS/target/pocket/pocket.go ]; then
+        /bin/ln -sf $JTFRAME_ABS/target/pocket/pocket.go $JTFRAME_ABS/src/jtframe/mra/pocket.go
         POCKET="-tags pocket"
         echo "Compiling jtframe with Pocket support" > /dev/stderr
     fi
-    cd $JTFRAME/src/jtframe > /dev/null
+    cd $JTFRAME_ABS/src/jtframe > /dev/null
     run_tests
     go build $POCKET . || exit $?
     cd - > /dev/null
+fi
+
+export JTFRAME="$JTFRAME_ORIG"
+if [ -n "$JTROOT_ORIG" ]; then
+    export JTROOT="$JTROOT_ORIG"
+fi
+if [ -n "$CORES_ORIG" ]; then
+    export CORES="$CORES_ORIG"
+fi
+if [ -n "$MODULES_ORIG" ]; then
+    export MODULES="$MODULES_ORIG"
 fi
 
 $BIN $*

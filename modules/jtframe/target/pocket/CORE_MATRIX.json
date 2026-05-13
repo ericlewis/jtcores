@@ -1,0 +1,782 @@
+{
+  "cores": {
+    "1942": {
+      "artifact_hash": "ea0370ebc28000a8893e63fb24be311c9f9cd175",
+      "bucket": "hardware_ok",
+      "core": "1942",
+      "notes": "User retested 1942 on Pocket and reported it is fine.",
+      "pocket_folder": "jotego.jt1942",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "1943": {
+      "artifact_hash": "04a964f3a560666b0df29d44735192d6be1af9a4",
+      "bucket": "hardware_ok",
+      "core": "1943",
+      "notes": "User reported 1943 works on Pocket.",
+      "pocket_folder": "jotego.jt1943",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "ajax": {
+      "artifact_hash": "abe683766bbdac7bd047456c7042692a2e065174",
+      "bucket": "hardware_ok",
+      "core": "ajax",
+      "notes": "User reported Ajax works on Pocket.",
+      "pocket_folder": "jotego.jtajax",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "aliens": {
+      "artifact_hash": "acc8fab34d7eff1caa6154ba4110bd2c93f8bae5",
+      "bucket": "hardware_issues",
+      "core": "aliens",
+      "next_action": "Audit live interact/DIP writeback and whether flip/orientation is latched only at reset; either make it live or mark the setting reset-required.",
+      "notes": "User reported Aliens works, but Flip Screen changes require a core reload before taking effect. `pocket_sim` passes package/load/APF video protocol at `320x224`; the stricter input-audio run now repairs the scenario to the selected `aliensu.rom` and reports static video plus `AUDIO_NO_POST_INPUT_ACTIVITY`, so the sim still does not prove live gameplay behavior.",
+      "pocket_folder": "jotego.jtaliens",
+      "result": "Hardware OK / Issues",
+      "section": "Hardware Issues"
+    },
+    "biocom": {
+      "artifact_hash": "99b2b819ae989987386e3c56efa61eb84bcbced3",
+      "bucket": "hardware_issues",
+      "core": "biocom",
+      "next_action": "Debug test/service/freeze polarity and post-self-test input or reset handoff before changing video metadata or ROM packaging.",
+      "notes": "User reported Bio-Combat reaches the RAM/ROM check screen with all OK, then hangs. `pocket_sim` now passes package/load/APF video protocol at `256x224` using public MC8051 translation plus FX68K Verilator compatibility flags, but combined `--input-video-gate --input-audio-gate` fails `VIDEO_NO_POST_INPUT_CHANGE` and `AUDIO_NO_POST_INPUT_ACTIVITY`: coin/start are delivered, no post-input frame changes are observed, and DAC samples remain zero.",
+      "pocket_folder": "jotego.jtbiocom",
+      "result": "Hardware frozen / fails",
+      "section": "Hardware Issues"
+    },
+    "btiger": {
+      "artifact_hash": "f1dcb01b922e1a14cec88e7b1d83b3593f196371",
+      "bucket": "hardware_issues",
+      "core": "btiger",
+      "next_action": "Copy the new `f1dcb...` artifact to SD and retest Black Tiger on hardware; if it still stalls, continue with warning-screen input/service/default-state debugging.",
+      "notes": "User reported Black Tiger does not get past the warning screen. The Pocket target now forces single-beat SDRAM programming writes and masks unused program burst beats, fixing the prior `MEMORY_ROM_WRITE_MISMATCH` at bank `3`, word `0xC0000C`. Fresh `pocket_sim` passes package/load/boot/interact/video with no SDRAM ROM mismatch, unwritten-read, coverage-gap, or byte-enable errors; SDRAM writes now match ROM preloads exactly (`884736`). APC rebuilt cleanly: setup `2.661 ns`, hold `0.214 ns`. Sim still warns static video/audio silence, so real hardware remains the authority for warning-screen/input behavior.",
+      "pocket_folder": "jotego.jtbtiger",
+      "result": "Hardware retest pending",
+      "section": "Hardware Issues"
+    },
+    "bubl": {
+      "artifact_hash": "9799e1d18e9730a5d574775f3370fab91d04e22c",
+      "bucket": "hardware_ok",
+      "core": "bubl",
+      "notes": "User reported Bubble Bobble/Bubl works on Pocket.",
+      "pocket_folder": "jotego.jtbubl",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "cal50": {
+      "artifact_hash": "93bad7cc39968eecccf16e40b4a1162e49af97a4",
+      "bucket": "hardware_issues",
+      "core": "cal50",
+      "next_action": "Recopy the regenerated Caliber 50 package to SD and retest slot selection; keep the memory-model warning as sim-only until hardware says otherwise.",
+      "notes": "User reported `cant match slot instance id`. Current `pocket_sim` package/load now passes at `376x240`, loads the ROM slot, verifies interact writes, and emits audio/video; the remaining sim failure is `MEMORY_UNINITIALIZED_READ` from the idealized memory gate. The target now emits the archived metadata's single `376x240`, `4:3`, rotation `90` scaler mode.",
+      "pocket_folder": "jotego.jtcal50",
+      "result": "Hardware retest pending",
+      "section": "Hardware Issues"
+    },
+    "capbowl": {
+      "bucket": "no_rtl",
+      "core": "capbowl",
+      "failure": "Core directory is schematic/reference work; there is no RTL implementation or standard JTFRAME cfg to export.",
+      "next_action": "Do not count as a Pocket target blocker until RTL exists.",
+      "section": "No RTL / Schematic Only",
+      "status": "No RTL / Schematic Only"
+    },
+    "castle": {
+      "artifact_hash": "55b21eb07aab1588510b1262ffb68e68ef620c4e",
+      "bucket": "hardware_issues",
+      "core": "castle",
+      "next_action": "Recopy regenerated metadata/package and retest hardware squashing; if still wrong, debug content/crop behavior rather than the APF active width.",
+      "notes": "User reported Haunted Castle video is very wrong or squashed. The target now emits `280x224`, `4:3`, rotation `0`, matching `JTFRAME_WIDTH` and the APF-facing stream. Focused crop-regression `pocket_sim` now passes package/load/boot/interact/video/audio at `280x224`; the remaining warnings are static-frame plus idealized memory/VHDL. APC rebuild passed timing: setup `2.545 ns`, hold `0.315 ns`.",
+      "pocket_folder": "jotego.jtcastle",
+      "result": "Hardware OK / Issues",
+      "section": "Hardware Issues"
+    },
+    "circus": {
+      "artifact_hash": "9ccb131a499154fe50509459efd1935a793c7e42",
+      "bucket": "hardware_ok",
+      "core": "circus",
+      "notes": "User retested Circus on Pocket and reported it is fine after the DIP/interact refresh.",
+      "pocket_folder": "jotego.jtcircus",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "commnd": {
+      "artifact_hash": "ee18ed3f79671b3afbe7e6b53a024aec3b604cc3",
+      "bucket": "hardware_issues",
+      "core": "commnd",
+      "next_action": "Recopy regenerated metadata and retest orientation; if still inverted, inspect `JTFRAME_OSD_FLIP`/coremod interaction because sim does not validate human-visible orientation.",
+      "notes": "User reported Commando is upside down and rotate/flip options do not fix it. The target now emits the archived metadata's single `256x224`, `4:3`, rotation `90` scaler mode. `pocket_sim` passes package/load/APF video protocol at `256x224`.",
+      "pocket_folder": "jotego.jtcommnd",
+      "result": "Hardware OK / Issues",
+      "section": "Hardware Issues"
+    },
+    "comsc": {
+      "artifact_hash": "9d50b9e71b6a02c3075017ce15804457410cb5b1",
+      "bucket": "hardware_issues",
+      "core": "comsc",
+      "next_action": "Recopy regenerated metadata/package and retest; if hardware still shows one line, debug APF blanking/content rather than scaler active width.",
+      "notes": "User reported Combat School video is like one line. The target now emits `280x224`, `4:3`, rotation `0`, matching the APF-facing active stream measured by `pocket_sim` and `JTFRAME_WIDTH`; the earlier `264x224` override caused a `VIDEO_WIDTH_MISMATCH` and did not explain the hardware one-line symptom. Focused crop-regression `pocket_sim` now passes package/load/APF video protocol at `280x224` and sees active audio in the non-input smoke.",
+      "pocket_folder": "jotego.jtcomsc",
+      "result": "Hardware retest pending",
+      "section": "Hardware Issues"
+    },
+    "contra": {
+      "artifact_hash": "1db8b0b58b6d9901dcef35a6e4c239939b982beb",
+      "bucket": "hardware_ok",
+      "core": "contra",
+      "notes": "User reported Contra works on Pocket.",
+      "pocket_folder": "jotego.jtcontra",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "cop": {
+      "artifact_hash": "c594f20cd8e1cae9dfc014f715d90254bd14e71f",
+      "bucket": "hardware_ok",
+      "core": "cop",
+      "notes": "User reported Cop works on Pocket.",
+      "pocket_folder": "jotego.jtcop",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "cps1": {
+      "artifact_hash": "f669316b5aeb78c5866a5c77d466267f5f2b128e",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "cps1",
+      "notes": "CPS1 now uses a generated Pocket `cfg/mem.yaml` / `JTFRAME_MEMGEN` wrapper boundary instead of the legacy internal `jtcps1_sdram` topology. Hardware reported black screen on the previous generated-wrapper artifact, which used one-cycle CPS ROM programming pulses. This build restores the legacy CPS download handshake by feeding SDRAM `prog_rdy` back into `jtcps1_prom_we`; package-check passes, but APC still reports tiny PLL hold/removal timing violations (`-0.002 ns` / `-0.001 ns`) despite positive setup `0.677 ns` and hold `0.281 ns` on the main summary. Needs SD copy and hardware retest.",
+      "pocket_folder": "jotego.jtcps1",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "cps15": {
+      "artifact_hash": "35198c0f0d62668790b0176c0e762d0e4a7b99fa",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "cps15",
+      "notes": "CPS1.5 now uses the generated CPS Pocket memory wrapper path. Hardware reported black screen on the previous generated-wrapper artifact. This build restores the legacy CPS download handshake by feeding SDRAM `prog_rdy` back into `jtcps1_prom_we`; package-check passes, but APC still reports tiny PLL hold/removal timing violations (`-0.009 ns` / main summary hold `0.299 ns`). Needs SD copy and hardware retest.",
+      "pocket_folder": "jotego.jtcps15",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "cps2": {
+      "artifact_hash": "64fb9c517505a8f85e9dd3a869bafaa8f4f5d2ca",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "cps2",
+      "notes": "CPS2 now uses the generated CPS Pocket memory wrapper path. Hardware reported black screen on the previous generated-wrapper artifact. This build restores the legacy CPS download handshake by feeding SDRAM `prog_rdy` back into `jtcps1_prom_we`; APC is timing-clean with setup `0.680 ns`, hold `0.286 ns`, and package-check passes. Needs SD copy and hardware retest.",
+      "pocket_folder": "jotego.jtcps2",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "cps3": {
+      "bucket": "blocked_failed",
+      "core": "cps3",
+      "failure": "`jtframe cfgstr` cannot open `cores/cps3/cfg/macros.def`.",
+      "next_action": "Add/restore standard cfg metadata before retrying Pocket export.",
+      "section": "Blocked / Failed",
+      "status": "Blocked before build"
+    },
+    "dd": {
+      "artifact_hash": "eecbaa98060d9f4125100d7e9bba40f04654a4dc",
+      "bucket": "hardware_ok",
+      "core": "dd",
+      "notes": "DD now boots with working video, audio, and controls after loader pacing, Pocket audio bridge, and controller/analog-neutral fixes. Tested SD path used existing metadata with `jtdd.rbf_r`.",
+      "pocket_folder": "jotego.jtdd",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "dd2": {
+      "artifact_hash": "b651579a702c633362ebe5c04ea7a651f933b444",
+      "bucket": "hardware_ok",
+      "core": "dd2",
+      "notes": "User reported Double Dragon II works on Pocket.",
+      "pocket_folder": "jotego.jtdd2",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "exed": {
+      "artifact_hash": "d50ddaebb198cff7bad47117cdc01999516be513",
+      "bucket": "hardware_issues",
+      "core": "exed",
+      "next_action": "Recopy regenerated metadata, then verify service/freeze/default DIP polarity or core behavior if the image still glitches.",
+      "notes": "User reported Exed Exes looks glitched, and freeze/service polarity is unclear. The target now emits the archived metadata's single `256x224`, `4:3`, rotation `90` scaler mode. `pocket_sim` passes package/load/APF video protocol at `256x224`.",
+      "pocket_folder": "jotego.jtexed",
+      "result": "Hardware OK / Issues",
+      "section": "Hardware Issues"
+    },
+    "flane": {
+      "artifact_hash": "5b1efcceb54a47a687833d8f734daac82be6f7c8",
+      "bucket": "hardware_ok",
+      "core": "flane",
+      "notes": "User reported Flak Attack/Flane appears fine on Pocket.",
+      "pocket_folder": "jotego.jtflane",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "flstory": {
+      "artifact_hash": "6228b0fed511d814d7dc8403d774c18105edf7fe",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "flstory",
+      "notes": "APC build passed timing: setup `2.122 ns`, hold `0.294 ns`. Generated video metadata is `256x224`, rotation `90`. Configured asset cache payloads now let `pocket_sim --instance-match \"FairyLand\"` select `The FairyLand Story.json`; the sim reaches `256x224` APF video with active audio, then fails `DATA_LOADED_BYTE_COUNT_MISMATCH` and also warns `MEMORY_ROM_COVERAGE_GAP`.",
+      "pocket_folder": "jotego.jtflstory",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "fround": {
+      "artifact_hash": "a8958272ba4d22ac5c37a4b868ea99eb36da2731",
+      "bucket": "hardware_ok",
+      "core": "fround",
+      "notes": "User reported Final Round works on Pocket.",
+      "pocket_folder": "jotego.jtfround",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "gaiden": {
+      "artifact_hash": "cc5a0b96a3784ac33f8de6958f8f0b8f17a47849",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "gaiden",
+      "notes": "APC build passed timing: setup `1.684 ns`, hold `0.294 ns`. Generated video metadata is `256x224`, rotation `0`; data has 4 slots. Synthesis emitted non-fatal MIF depth warnings for `jtgaiden_wildfang_lut` and `jt6295_adpcm`. With configured asset cache payloads, baseline `pocket_sim` passes package/load/APF video protocol at `256x224` but still sees a static frame and silent audio in the short smoke.",
+      "pocket_folder": "jotego.jtgaiden",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "gng": {
+      "artifact_hash": "4679b163eeeb2a355c489bcbc131bd9c300ab08e",
+      "bucket": "hardware_ok",
+      "core": "gng",
+      "notes": "User reported GNG works after full package copy to SD.",
+      "pocket_folder": "jotego.jtgng",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "grad3": {
+      "bucket": "no_rtl",
+      "core": "grad3",
+      "failure": "Core directory is schematic/reference work; there is no RTL implementation or standard JTFRAME cfg to export.",
+      "next_action": "Do not count as a Pocket target blocker until RTL exists.",
+      "section": "No RTL / Schematic Only",
+      "status": "No RTL / Schematic Only"
+    },
+    "gunbird2": {
+      "bucket": "no_rtl",
+      "core": "gunbird2",
+      "failure": "Core directory is schematic/reference work; there is no RTL implementation or standard JTFRAME cfg to export.",
+      "next_action": "Do not count as a Pocket target blocker until RTL exists.",
+      "section": "No RTL / Schematic Only",
+      "status": "No RTL / Schematic Only"
+    },
+    "gunsmk": {
+      "artifact_hash": "f1e3064dab0e79976434b3366d73755c2150c7e5",
+      "bucket": "hardware_ok",
+      "core": "gunsmk",
+      "notes": "User reported Gun.Smoke works on Pocket.",
+      "pocket_folder": "jotego.jtgunsmk",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "karnov": {
+      "artifact_hash": "fff8911735e67d4958bb92ec67e00a72ab0e081d",
+      "bucket": "hardware_ok",
+      "core": "karnov",
+      "notes": "User reported Karnov works on Pocket.",
+      "pocket_folder": "jotego.jtkarnov",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "kchamp": {
+      "artifact_hash": "a3adab14d94dbab369a9779d93d32520356abffd",
+      "bucket": "hardware_issues",
+      "core": "kchamp",
+      "next_action": "Recopy regenerated metadata and retest rotation/flip; if still inverted, inspect the `status[1]` to `dip_flip` default against `main_flip`.",
+      "notes": "User reported Karate Champ is upside down and rotate does not work. The target now emits the archived metadata's single `256x224`, `4:3`, rotation `90` scaler mode. `pocket_sim` passes package/load/APF video protocol at `256x224`.",
+      "pocket_folder": "jotego.jtkchamp",
+      "result": "Hardware OK / Issues",
+      "section": "Hardware Issues"
+    },
+    "kicker": {
+      "artifact_hash": "6763e28b2a42e6e7c40f79b52f90539abb1cc410",
+      "bucket": "hardware_issues",
+      "core": "kicker",
+      "next_action": "Recopy regenerated metadata if not already on SD; if tilemap corruption remains, compare hardware against the clean video sim path and inspect whether the one-word coverage gap is benign or a real screen-ROM tail read.",
+      "notes": "User reported Kicker has tilemap-looking corruption. The target emits the archived metadata's single `256x224`, `4:3`, rotation `90` scaler mode. `pocket_sim` now passes package/load/boot/interact/save/video at `256x224`; the source-attributed memory warning is a single `MEMORY_ROM_COVERAGE_GAP` at SDRAM word `0xF001`, source `kicker.rom+0x1E002`. Sim audio remains silent (`AUDIO_NO_DAC_ACTIVITY` warning), so audio is not proven by sim.",
+      "pocket_folder": "jotego.jtkicker",
+      "result": "Hardware OK / Issues",
+      "section": "Hardware Issues"
+    },
+    "kiwi": {
+      "artifact_hash": "b3fcd40826974f8dfa569aa9b84b075075252a24",
+      "bucket": "hardware_ok",
+      "core": "kiwi",
+      "notes": "User reported Kiwi works on Pocket.",
+      "pocket_folder": "jotego.jtkiwi",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "ktiger": {
+      "bucket": "no_rtl",
+      "core": "ktiger",
+      "failure": "Core directory is schematic/reference work; there is no RTL implementation or standard JTFRAME cfg to export.",
+      "next_action": "Do not count as a Pocket target blocker until RTL exists.",
+      "section": "No RTL / Schematic Only",
+      "status": "No RTL / Schematic Only"
+    },
+    "kunio": {
+      "artifact_hash": "65c5577ef9814cfc9a5ea5de7e3cf4e7423cc11b",
+      "bucket": "hardware_ok",
+      "core": "kunio",
+      "notes": "User reported Kunio appears fine on Pocket.",
+      "pocket_folder": "jotego.jtkunio",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "labrun": {
+      "artifact_hash": "0502eb1e1d695aab228f38b397633929d0709067",
+      "bucket": "hardware_ok",
+      "core": "labrun",
+      "notes": "User reported Labyrinth Runner works on Pocket.",
+      "pocket_folder": "jotego.jtlabrun",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "midres": {
+      "artifact_hash": "70e0baa84fbc1b841761c7833682aebcd5c2188f",
+      "bucket": "hardware_ok",
+      "core": "midres",
+      "notes": "User reported Midnight Resistance works on Pocket.",
+      "pocket_folder": "jotego.jtmidres",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "mikie": {
+      "artifact_hash": "afc5ec4d40d3df8ffbb4ccb265fe6ea4099871ed",
+      "bucket": "hardware_issues",
+      "core": "mikie",
+      "next_action": "Debug Mikie sprite ROM address/byte-lane remapping and keep orientation as a separate metadata/core-flip issue.",
+      "notes": "User reported Mikie has tilemap corruption, is upside down, and rotate does not work. The target emits the archived metadata's single `256x224`, `4:3`, rotation `90` scaler mode. Safe runtime collateral staging avoids the previous oversized `msg.bin` Verilator fatal, and `pocket_sim` now reaches the real memory gate: `MEMORY_ROM_WRITE_MISMATCH` at SDRAM word `0x10034`, source `mikie.rom+0x20068`, expected `0x0000`, actual `0x9600`, both byte lanes checked.",
+      "pocket_folder": "jotego.jtmikie",
+      "result": "Hardware OK / Issues",
+      "section": "Hardware Issues"
+    },
+    "mx5k": {
+      "artifact_hash": "1a0b99980461c5b5163a9978532bbb9e5c052230",
+      "bucket": "hardware_ok",
+      "core": "mx5k",
+      "notes": "User reported MX5000 works on Pocket.",
+      "pocket_folder": "jotego.jtmx5k",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "ngp": {
+      "artifact_hash": "72e7071e32be443dd568af0f9b0e90c935be699b",
+      "bucket": "hardware_issues",
+      "core": "ngp",
+      "next_action": "Add a valid `.ngp` or `.ngc` cart file to the SD asset flow, then retest.",
+      "notes": "User reported NGP needs ROMs. `pocket_sim` now fails this as `DATA_SLOT_REQUIRED_MISSING`: firmware slot `1` loads `ngp.rom`, but required cartridge slot `4` has no `.ngp` or `.ngc` payload. The APF-facing shape is `160x152` before the data assertion fails.",
+      "pocket_folder": "jotego.jtngp",
+      "result": "Hardware blocked / missing assets",
+      "section": "Hardware Issues"
+    },
+    "ngpc": {
+      "artifact_hash": "0efcb2a29577fefecff385c2e9bf79c228211938",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "ngpc",
+      "notes": "First Pocket attempt now passes APC timing: setup `3.033 ns`, hold `0.287 ns`. Fit is moderate at 68% ALMs, 62% M10K, and 3% DSP. Export printed a non-fatal `jtframe mem` warning while updating `jtngpc_game.v`. `pocket_sim` remains asset-blocked: no `.ngp` or `.ngc` cartridge payload was found under `Assets/jtngpc`.",
+      "pocket_folder": "jotego.jtngpc",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "ninja": {
+      "artifact_hash": "24b9419d99957d1fce0127189fb09f1427ababbd",
+      "bucket": "hardware_ok",
+      "core": "ninja",
+      "notes": "User reported Ninja/Bad Dudes works on Pocket.",
+      "pocket_folder": "jotego.jtninja",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "odyssey": {
+      "bucket": "no_rtl",
+      "core": "odyssey",
+      "failure": "Core directory is schematic/reference work; there is no RTL implementation or standard JTFRAME cfg to export.",
+      "next_action": "Do not count as a Pocket target blocker until RTL exists.",
+      "section": "No RTL / Schematic Only",
+      "status": "No RTL / Schematic Only"
+    },
+    "outrun": {
+      "bucket": "blocked_failed",
+      "core": "outrun",
+      "failure": "Quartus fitter cannot fit the design in the Pocket Cyclone V: selected device has 308 M10K blocks, but the exported `outrun` design needs more than 308. The pressure is dominated by BRAM road ROMs (`rd0`/`rd1`) plus 32Kx16 saved work RAM.",
+      "next_action": "Add a bespoke Pocket memory strategy for road/work RAM before retrying; do not disable accurate road timing as a first cut.",
+      "section": "Blocked / Failed",
+      "status": "Build failed"
+    },
+    "paclan": {
+      "artifact_hash": "34ac2698fb10690b09a6e376b8890e3952e61442",
+      "bucket": "hardware_issues",
+      "core": "paclan",
+      "next_action": "Recopy the regenerated Pac-Land package and payloads to SD and retest.",
+      "notes": "User reported Pac-Land needs JSON/ROMs. Current `pocket_sim` package/load now passes at `288x224` using configured asset cache payloads, so this is ready for a fresh SD copy rather than more target changes.",
+      "pocket_folder": "jotego.jtpaclan",
+      "result": "Hardware retest pending",
+      "section": "Hardware Issues"
+    },
+    "pang": {
+      "artifact_hash": "31cc288ea29109a9712bfdc190e48c9c67b2a6f0",
+      "bucket": "hardware_issues",
+      "core": "pang",
+      "next_action": "Debug reset/content/input-visible state and compare loader/status behavior with working `cop` and `rastan`; do not treat this as a generic package-shape failure.",
+      "notes": "User retested Pang on Pocket and confirmed a black screen. Build timing was clean: setup `2.696 ns`, hold `0.270 ns`. `pocket_sim` now passes package/load/APF video protocol at `384x240`, but combined `--input-video-gate --input-audio-gate` fails `VIDEO_NO_POST_INPUT_CHANGE` and `AUDIO_NO_POST_INPUT_ACTIVITY`: coin/start are delivered, no post-input frame changes are observed, and DAC samples remain zero.",
+      "pocket_folder": "jotego.jtpang",
+      "result": "Hardware black screen",
+      "section": "Hardware Issues"
+    },
+    "paroda": {
+      "artifact_hash": "6fe78e9894f77247e14085a57dfce86236abeb71",
+      "bucket": "hardware_ok",
+      "core": "paroda",
+      "notes": "User reported Parodius works on Pocket.",
+      "pocket_folder": "jotego.jtparoda",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "pinpon": {
+      "artifact_hash": "9a5c3757fce482bec9858da5a41d8cdf53c96c61",
+      "bucket": "hardware_ok",
+      "core": "pinpon",
+      "notes": "User reported Pin-Pong works on Pocket.",
+      "pocket_folder": "jotego.jtpinpon",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "prmr": {
+      "artifact_hash": "aae912324ac16062bfa2576adea86364b628eca7",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "prmr",
+      "notes": "Public `jt539` behavioral K054539 build passed APC timing: setup `2.502 ns`, hold `0.287 ns`. Current `pocket_sim` binds `Premier Soccer (ver EAB)`, passes package/load/APF video protocol at `304x224`, but captures static video and silent audio; export also warns `JTFRAME_IOCTL_RD` should be `2176`.",
+      "pocket_folder": "jotego.jtprmr",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "rastan": {
+      "artifact_hash": "0a59477ab76af83862d00300a26b748e2365314c",
+      "bucket": "hardware_ok",
+      "core": "rastan",
+      "notes": "User reported Rastan works on Pocket.",
+      "pocket_folder": "jotego.jtrastan",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "rbike": {
+      "bucket": "no_rtl",
+      "core": "rbike",
+      "failure": "Core directory is schematic/reference work; there is no RTL implementation or standard JTFRAME cfg to export.",
+      "next_action": "Do not count as a Pocket target blocker until RTL exists.",
+      "section": "No RTL / Schematic Only",
+      "status": "No RTL / Schematic Only"
+    },
+    "riders": {
+      "artifact_hash": "d61dca09344003d73dc9269b11f805ce5006e286",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "riders",
+      "notes": "APC build passed after staging core HDL synthesis collateral (`log2.hex`, `exp2.hex`, `collut.hex`) for Quartus: setup `2.089 ns`, hold `0.299 ns`. `pocket_sim` package-check passes, but bring-up is asset-blocked because no ROM payload is present under `Assets/jtriders`.",
+      "pocket_folder": "jotego.jtriders",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "risle": {
+      "bucket": "no_rtl",
+      "core": "risle",
+      "failure": "Core directory is schematic/reference work; there is no RTL implementation or standard JTFRAME cfg to export.",
+      "next_action": "Do not count as a Pocket target blocker until RTL exists.",
+      "section": "No RTL / Schematic Only",
+      "status": "No RTL / Schematic Only"
+    },
+    "roadf": {
+      "artifact_hash": "e8d08bed181c5276b58639966fec150e0600b6b1",
+      "bucket": "hardware_issues",
+      "core": "roadf",
+      "next_action": "Recopy regenerated metadata, then debug tilemap/screen ROM decode and SDRAM ROM coverage mapping if artifacts remain.",
+      "notes": "User reported Road Fighter runs, but shows a tilemap-looking bug. Build timing was clean after seed `2`: setup `2.421 ns`, hold `0.279 ns`. The target emits the archived metadata's explicit `256/240/224` crop and `0/270/90` rotation scaler list. A targeted `pocket_sim --instance-match \"Road Fighter\"` run now binds `Road Fighter (set 1).json` and `roadf.rom`, passes package/load/boot/interact/save/video at `256x224`, and warns `MEMORY_ROM_COVERAGE_GAP` at SDRAM word `0xA000`, source `roadf.rom+0x14000`.",
+      "pocket_folder": "jotego.jtroadf",
+      "result": "Hardware OK / Issues",
+      "section": "Hardware Issues"
+    },
+    "roc": {
+      "artifact_hash": "4a86e2d93ea1d9310e3d1580e7a9401d89298b9d",
+      "bucket": "hardware_issues",
+      "core": "roc",
+      "next_action": "Recopy regenerated target package/metadata to SD and retest tilemap/orientation; if corruption remains, compare hardware against the clean sim path and handle rotation/core-flip separately.",
+      "notes": "User reported Roc'n Rope has tilemap corruption, is upside down, and rotate does not work. The target emits the archived metadata's single `256x224`, `4:3`, rotation `90` scaler mode. After the Pocket data-slot priority fix, `pocket_sim` now passes package/load/boot/interact/save/video/audio at `256x224`; the previous low-address SDRAM mismatch was stale ROM-drain corruption during the NVRAM slot load, not a Roc-specific ROM mapper failure.",
+      "pocket_folder": "jotego.jtroc",
+      "result": "Hardware OK / Issues",
+      "section": "Hardware Issues"
+    },
+    "rollerg": {
+      "bucket": "no_rtl",
+      "core": "rollerg",
+      "failure": "Core directory is schematic/reference work; there is no RTL implementation or standard JTFRAME cfg to export.",
+      "next_action": "Do not count as a Pocket target blocker until RTL exists.",
+      "section": "No RTL / Schematic Only",
+      "status": "No RTL / Schematic Only"
+    },
+    "rumble": {
+      "artifact_hash": "7cbd0068fc1f605ee013ffae95b17c8f87c77dcb",
+      "bucket": "hardware_issues",
+      "core": "rumble",
+      "next_action": "Recopy the regenerated metadata and retest scaler size/aspect/start orientation on hardware.",
+      "notes": "User reported Rumble works, but the video size or aspect ratio is wrong. The Pocket target now emits the archived scaler policy exactly: one `352x240`, `4:3`, rotation `90` mode. Focused crop-regression `pocket_sim` passes package/load/APF video protocol at `352x240`; warnings are static video/audio plus idealized memory/VHDL.",
+      "pocket_folder": "jotego.jtrumble",
+      "result": "Hardware OK / Issues",
+      "section": "Hardware Issues"
+    },
+    "rungun": {
+      "bucket": "blocked_failed",
+      "core": "rungun",
+      "failure": "Public `jt539` now exists and `rungun` exports with it, but the last full APC attempt was the earlier no-sound build and it still failed fitter because the design needs more than the Pocket's 308 M10K blocks. Remaining BRAM pressure is mainly PSAC/tile/video working RAM (`psac01`, `psac2`, `vram`, `pal`, `line`, `nvram`), and a full two-`jt539` sound build is expected to add pressure.",
+      "next_action": "Add a bespoke Pocket memory strategy for PSAC/video RAM before retrying the full-sound build.",
+      "section": "Blocked / Failed",
+      "status": "Build failed"
+    },
+    "s16": {
+      "artifact_hash": "c642481fdc8ddf163f28edfdd690707556d31ace",
+      "bucket": "hardware_issues",
+      "core": "s16",
+      "next_action": "Recopy regenerated metadata and retest orientation on hardware; decide whether the Shinobi ROM coverage gap is an expected protected-set access or a real payload/window issue.",
+      "notes": "User reported System 16 works, but is upside down. The Pocket target now emits the archived metadata's System 16 scaler order with `320x224` rotation `0` first plus `304/288` crop alternatives. Focused crop-regression `pocket_sim` reaches `320x224` APF video, then fails `DATA_LOADED_BYTE_COUNT_MISMATCH`; a targeted `pocket_sim --instance-match \"Shinobi\"` run also reports `MEMORY_ROM_COVERAGE_GAP` at `shinobi.rom+0x100000`.",
+      "pocket_folder": "jotego.jts16",
+      "result": "Hardware OK / Issues",
+      "section": "Hardware Issues"
+    },
+    "s16b": {
+      "artifact_hash": "4e9f0ee0119a4af6cd18ceaad7c458a1eeecd34a",
+      "bucket": "hardware_ok",
+      "core": "s16b",
+      "notes": "User reported System 16B works on Pocket.",
+      "pocket_folder": "jotego.jts16b",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "s18": {
+      "bucket": "blocked_failed",
+      "core": "s18",
+      "failure": "Last full APC build required `2299` LABs on a device with `1848` LABs. The `ext_flip` port loop is fixed locally and S18 timing SDC filters are now hierarchy-guarded; a fresh export passes.",
+      "next_action": "Reduce S18 area before retrying a full Pocket fit.",
+      "section": "Blocked / Failed",
+      "status": "Build failed"
+    },
+    "sarms": {
+      "artifact_hash": "dba848ed985d80f7bf4692ef2a5d3c7e9d6d942b",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "sarms",
+      "notes": "APC build passed timing: setup `2.393 ns`, hold `0.232 ns`. Generated video metadata is `384x224`, rotation `0`. With configured asset cache payloads, baseline `pocket_sim` selects `Hyper Dyne Side Arms (World, 861129)` and passes package/load/APF video protocol at `384x224`, but captures static video and silent audio.",
+      "pocket_folder": "jotego.jtsarms",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "sbaskt": {
+      "artifact_hash": "b0f4777f8b17aa5b32a7a9e73731ef0549d58b31",
+      "bucket": "hardware_issues",
+      "core": "sbaskt",
+      "next_action": "Debug core-visible reset/video/content behavior on hardware; package/load shape and the VLM5030 translation are no longer the leading suspects.",
+      "notes": "User retested Super Basketball on Pocket and confirmed a black screen. Build timing was clean: setup `2.658 ns`, hold `0.225 ns`. `pocket_sim` now passes package/load/APF video protocol at `256x224` after the public VLM5030 translation, but combined `--input-video-gate --input-audio-gate` fails `VIDEO_NO_POST_INPUT_CHANGE` and `AUDIO_NO_POST_INPUT_ACTIVITY`: coin/start are delivered, no post-input frame changes are observed, and DAC samples remain zero.",
+      "pocket_folder": "jotego.jtsbaskt",
+      "result": "Hardware black screen",
+      "section": "Hardware Issues"
+    },
+    "sectnz": {
+      "artifact_hash": "b18d204bc097c886d071486780026d5f8bf376bc",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "sectnz",
+      "notes": "APC build passed timing: setup `2.264 ns`, hold `0.223 ns`. Generated video metadata is `256x240`, rotation `90`. With configured asset cache payloads, baseline `pocket_sim` selects `Section Z (US)` and passes package/load/APF video protocol at `256x240`, but captures static video and silent audio.",
+      "pocket_folder": "jotego.jtsectnz",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "sf": {
+      "artifact_hash": "7d09efc187ae56013fbceeb684b2b26773e63245",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "sf",
+      "notes": "APC build passed timing with a tighter setup margin: setup `0.992 ns`, hold `0.297 ns`. Generated video metadata is `384x224`, rotation `0`. With configured asset cache payloads, baseline `pocket_sim` passes package/load/APF video protocol at `384x224` and sees active audio, but video remains static/blank in the short smoke.",
+      "pocket_folder": "jotego.jtsf",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "shanon": {
+      "artifact_hash": "939fd40297d576149aa3ba49ce8207db592f3b68",
+      "bucket": "hardware_ok",
+      "core": "shanon",
+      "notes": "User reported Super Hang-On works on Pocket.",
+      "pocket_folder": "jotego.jtshanon",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "shouse": {
+      "artifact_hash": "79d63c816e0311a51b05200be940fe724ad897dd",
+      "bucket": "hardware_issues",
+      "core": "shouse",
+      "next_action": "Recopy regenerated metadata and retest vertical variants; separately fix the `JTFRAME_IOCTL_RD` size if save/load symptoms appear.",
+      "notes": "User reported the Namco System 1 package runs, but rotation does not work. The Pocket target now emits the archived metadata's full `288/272/256` crop list with `0/270/90` rotations where present. Focused crop-regression `pocket_sim` passes package/load/APF video protocol at `288x224`; export still warns `JTFRAME_IOCTL_RD` should be `63488`.",
+      "pocket_folder": "jotego.jtshouse",
+      "result": "Hardware OK / Issues",
+      "section": "Hardware Issues"
+    },
+    "simson": {
+      "artifact_hash": "e6d3ef8e736440ef52d5b93d7022273fd74b8819",
+      "bucket": "hardware_issues",
+      "core": "simson",
+      "next_action": "Debug reset release, content enable, or input-visible state against the black hardware behavior; package/video shape is no longer the leading suspect.",
+      "notes": "User reported Simpsons is black screen on Pocket. Build timing passed with tight setup margin: setup `0.394 ns`, hold `0.305 ns`. `pocket_sim` now passes package/load/APF video protocol at `320x224`, but combined `--input-video-gate --input-audio-gate` fails `VIDEO_NO_POST_INPUT_CHANGE` and `AUDIO_NO_POST_INPUT_ACTIVITY`: coin/start are delivered, no post-input frame changes are observed, and DAC samples remain zero.",
+      "pocket_folder": "jotego.jtsimson",
+      "result": "Hardware black screen",
+      "section": "Hardware Issues"
+    },
+    "slyspy": {
+      "artifact_hash": "fae461ca4d0cd0ce5fbf9695a8ff17e0a26a55f7",
+      "bucket": "hardware_ok",
+      "core": "slyspy",
+      "notes": "User reported Sly Spy works on Pocket.",
+      "pocket_folder": "jotego.jtslyspy",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "sx": {
+      "bucket": "no_rtl",
+      "core": "sx",
+      "failure": "Core directory is schematic/reference work; there is no RTL implementation or standard JTFRAME cfg to export.",
+      "next_action": "Do not count as a Pocket target blocker until RTL exists.",
+      "section": "No RTL / Schematic Only",
+      "status": "No RTL / Schematic Only"
+    },
+    "thundr": {
+      "artifact_hash": "279952d05e682a21c9bc5c05ef242aaaa0fd0a98",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "thundr",
+      "notes": "Rebuilt with generated instance JSONs and generated DIP alias; APC passed timing: setup `2.220 ns`, hold `0.289 ns`. `pocket_sim` package-check passes, but bring-up is asset-blocked because no ROM payload is present under `Assets/jtthundr`.",
+      "pocket_folder": "jotego.jtthundr",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "tmnt": {
+      "artifact_hash": "49f69c5b3c69a77a936d3864718896aff5ab03f9",
+      "bucket": "hardware_ok",
+      "core": "tmnt",
+      "notes": "User reported TMNT works on Pocket.",
+      "pocket_folder": "jotego.jttmnt",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "toki": {
+      "artifact_hash": "9351b53db8046e3ae8917c868ed677578651deec",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "toki",
+      "notes": "APC rebuild passed timing: setup `0.674 ns`, hold `0.307 ns`. The Pocket shell now gates APF `DE` to the declared `JTFRAME_HEIGHT`, and pocket_sim's JTFRAME logical wrapper mirrors that behavior. Focused crop-regression `pocket_sim` now passes package/load/boot/interact/video at `256x224`; the smoke is still static/silent under idealized memory/VHDL.",
+      "pocket_folder": "jotego.jttoki",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "tora": {
+      "artifact_hash": "78031ed0e37d60906bce12699773da88f8c6b149",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "tora",
+      "notes": "APC build passed timing: setup `2.261 ns`, hold `0.228 ns`. Generated video metadata is `256x224`, rotation `0`. Targeted `pocket_sim --instance-match \"Tiger Road\"` selects `Tiger Road (US)` and reaches `256x224` APF video, then fails `DATA_LOADED_BYTE_COUNT_MISMATCH`; video is static and audio is silent before the assertion.",
+      "pocket_folder": "jotego.jttora",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "track": {
+      "artifact_hash": "3d2954c439e51246a6df89e96b697fda0f30720d",
+      "bucket": "hardware_issues",
+      "core": "track",
+      "next_action": "Debug `flip` default/readback and compare hardware against the clean video/memory sim path; do not assume a `video.json` rotation fix is enough, and do not treat sim audio as proven yet.",
+      "notes": "User reported Track & Field has tilemap corruption, is upside down, and rotate does not work. Export treats it as horizontal `256x224`, rotation `0`. After the generated JTFRAME sim wrapper started driving the SDRAM pin model from the Verilator write-data sideband, `pocket_sim` passes package/load/boot/interact/save/video at `256x224` with the public VLM5030 translation and no SDRAM memory errors, but the stricter input-audio gate reports `AUDIO_NO_POST_INPUT_ACTIVITY`/`AUDIO_NO_DAC_ACTIVITY`.",
+      "pocket_folder": "jotego.jttrack",
+      "result": "Hardware OK / Issues",
+      "section": "Hardware Issues"
+    },
+    "trojan": {
+      "artifact_hash": "c7ad1b5000fa6f21ed3e8b8e71fbe84f5b077257",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "trojan",
+      "notes": "APC build passed timing after SDC clock-group hardening: setup `2.788 ns`, hold `0.217 ns`. Generated video metadata is `256x240`, rotation `90`. A strict targeted `pocket_sim --instance-match \"Trojan (\"` run selects `Trojan (US set 1)` and passes package/load/APF video protocol at `256x240` with active audio; the short smoke still captures static video.",
+      "pocket_folder": "jotego.jttrojan",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "twin16": {
+      "artifact_hash": "593d527de29f8fc8cc50b0cf9116e053e5aba4b1",
+      "bucket": "hardware_ok",
+      "core": "twin16",
+      "notes": "User retested Twin16 on Pocket and reported it is fine.",
+      "pocket_folder": "jotego.jttwin16",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "vigil": {
+      "artifact_hash": "c6508a2c2ca7e369d8b9c4967ff8e5c496de15b4",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "vigil",
+      "notes": "APC build passed timing: setup `2.697 ns`, hold `0.318 ns`. Generated video metadata is `256x256`, rotation `0`. With configured asset cache payloads, baseline `pocket_sim` selects `Vigilante (World, Rev E)` and passes package/load/save/APF video at `256x256` with active audio, but captures static video; export still warns about `JTFRAME_IOCTL_RD`, and Verilator reports `ioctl_din` as an implicit one-bit net in `jtvigil_game.v`.",
+      "pocket_folder": "jotego.jtvigil",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "wc": {
+      "artifact_hash": "ee3c7a4b4b4c18824dad56105e1d61823e1323fc",
+      "bucket": "hardware_ok",
+      "core": "wc",
+      "notes": "User reported World Cup works on Pocket.",
+      "pocket_folder": "jotego.jtwc",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "wwfss": {
+      "artifact_hash": "bda9790ea07bf73449113bb647ac27d279b58732",
+      "bucket": "hardware_ok",
+      "core": "wwfss",
+      "notes": "User reported WWF Superstars works on Pocket.",
+      "pocket_folder": "jotego.jtwwfss",
+      "result": "Hardware OK",
+      "section": "Working On Hardware"
+    },
+    "xmen": {
+      "artifact_hash": "d9cad750d833640e55ed63bb2367127dc98be106",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "xmen",
+      "notes": "Rebuilt with the public `jt539` behavioral K054539 enabled. Current `pocket_sim` selects `X-Men (4 Players ver EBA)`, passes package/load/APF video protocol at `304x224`, and confirms the public `jt539` build is compile/package viable; the smoke still captures static video and no DAC activity, so K054539 audio behavior is not proven yet.",
+      "pocket_folder": "jotego.jtxmen",
+      "section": "Build OK / Needs Hardware Test"
+    },
+    "yiear": {
+      "artifact_hash": "aa8e077263d586c5d051b34aa905431109f96a32",
+      "bucket": "build_ok_needs_hw_test",
+      "core": "yiear",
+      "notes": "APC build passed timing: setup `2.035 ns`, hold `0.294 ns`. With configured asset cache payloads, baseline `pocket_sim` selects `Yie Ar Kung-Fu (version G)` and passes package/load/save/APF video at `256x224` with active audio using the public VLM5030 translation.",
+      "pocket_folder": "jotego.jtyiear",
+      "section": "Build OK / Needs Hardware Test"
+    }
+  },
+  "coverage_summary": {
+    "Blocked or build failed": {
+      "count": 4,
+      "notes": "Preflight, synthesis, fitter, timing, or metadata blocked before hardware validation."
+    },
+    "Build OK / Needs HW test": {
+      "count": 18,
+      "notes": "APC passed timing, but Pocket hardware behavior still needs validation."
+    },
+    "Hardware OK": {
+      "count": 30,
+      "notes": "Confirmed on a real Pocket with boot, video, audio, and basic controls."
+    },
+    "Hardware issue / hardware asset blocker": {
+      "count": 22,
+      "notes": "Reaches hardware testing, but has a visible issue, freeze, black screen, or missing payload."
+    },
+    "No RTL / Schematic Only": {
+      "count": 9,
+      "notes": "Core directories exist, but they are schematic/reference work without an RTL implementation to port yet."
+    },
+    "Not yet attempted": {
+      "count": 0,
+      "notes": "All 83 `cores/*` directories now have an observed Pocket status."
+    }
+  },
+  "generated_at": "2026-05-13T09:13:26+00:00",
+  "matrix_core_count": 83,
+  "matrix_last_updated": "2026-04-27",
+  "matrix_path": "modules/jtframe/target/pocket/CORE_MATRIX.md",
+  "missing_from_matrix": [],
+  "repo_core_count": 83,
+  "section_counts": {
+    "blocked_failed": 4,
+    "build_ok_needs_hw_test": 18,
+    "hardware_issues": 22,
+    "hardware_ok": 30,
+    "no_rtl": 9
+  },
+  "unknown_in_matrix": []
+}

@@ -1,0 +1,11 @@
+jtframe:
+  - from: ver
+    get:
+      - video_dump.v
+      - mt48lc16m16a2.v
+
+jtframe/target/pocket:
+  - unless: [ VERILATOR ]
+    from: ../ver
+    get:
+      - test.v

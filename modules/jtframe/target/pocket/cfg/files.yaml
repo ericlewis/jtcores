@@ -1,0 +1,30 @@
+jtframe/target/pocket:
+  - get:
+    - core_bridge_cmd.v
+    - jtframe_pocket.sv
+    - jtframe_pocket_clocks.v
+    - jtframe_pocket_bridge.v
+    - jtframe_pocket_data_loader.v
+    - jtframe_pocket_sound_i2s.v
+    - jtframe_pocket_sync.v
+  - unless: [ SIMULATION ]
+    get:
+    - jtframe_pocket_pll.v
+    - pocket_top.sv
+    - common.v
+    - io_bridge_peripheral.v
+    - io_pad_controller.v
+    - pin_ddio_clk.v
+    - apf_constraints.sdc
+    - mf_ddio_bidir_12.qip
+
+jtframe:
+  - from: clocking
+    get:
+      - jtframe_rst_sync.v
+  - when: [ JTFRAME_LF_BUFFER ]
+    from: video
+    get:
+      - jtframe_lfbuf_bram.v
+      - jtframe_lfbuf_bram_ctrl.v
+      - jtframe_lfbuf_line.v

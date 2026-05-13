@@ -30,6 +30,7 @@ wire [15:0] oram_base;
 wire [18:0] snd_addr;
 wire [22:0] qsnd_addr;
 wire        prog_qsnd;
+wire [22:0] cps_prog_addr;
 wire [ 7:0] snd_data, qsnd_data;
 wire [17:1] ram_addr;
 wire [21:1] main_rom_addr;
@@ -72,6 +73,75 @@ wire [12:0] volume;
 // EEPROM
 wire        sclk, sdi, sdo, scs;
 
+`ifdef JTFRAME_MEMGEN
+`ifdef JTFRAME_SDRAM_LARGE
+wire [22:0] cps_post_addr;
+`else
+wire [21:0] cps_post_addr;
+`endif
+wire [ 7:0] cps_post_data;
+wire [ 1:0] cps_post_ba;
+wire [ 1:0] cps_post_mask;
+wire        cps_post_we;
+
+always @(*) begin
+    post_addr = cps_post_addr;
+    post_data = cps_post_data;
+    post_ba   = cps_post_ba;
+    post_mask = cps_post_mask;
+    post_we   = cps_post_we;
+end
+
+wire [15:0] main_ram_data_cpu = main_ram_data;
+wire [15:0] main_rom_data_cpu = main_rom_data;
+wire        main_ram_ok_cpu   = main_ram_ok;
+wire        main_rom_ok_cpu   = main_rom_ok;
+reg [31:0] dipsw_cpu;
+reg [12:0] volume_cpu;
+reg [ 9:0] joystick1_cpu, joystick2_cpu, joystick3_cpu, joystick4_cpu;
+reg [ 3:0] cab_1p_cpu, coin_cpu;
+reg [ 1:0] dial_x_cpu, dial_y_cpu, joymode_cpu;
+reg        service_cpu, dip_test_cpu, dip_pause_cpu, skip_en_cpu;
+
+always @(posedge clk48) begin
+    dipsw_cpu         <= dipsw;
+    volume_cpu        <= volume;
+    joystick1_cpu     <= joystick1;
+    joystick2_cpu     <= joystick2;
+    joystick3_cpu     <= joystick3;
+    joystick4_cpu     <= joystick4;
+    cab_1p_cpu        <= cab_1p;
+    coin_cpu          <= coin;
+    dial_x_cpu        <= dial_x;
+    dial_y_cpu        <= dial_y;
+    joymode_cpu       <= joymode;
+    service_cpu       <= service;
+    dip_test_cpu      <= dip_test;
+    dip_pause_cpu     <= dip_pause;
+    skip_en_cpu       <= skip_en;
+end
+`else
+wire [15:0] main_ram_data_cpu = main_ram_data;
+wire [15:0] main_rom_data_cpu = main_rom_data;
+wire        main_ram_ok_cpu   = main_ram_ok;
+wire        main_rom_ok_cpu   = main_rom_ok;
+wire [31:0] dipsw_cpu         = dipsw;
+wire [12:0] volume_cpu        = volume;
+wire [ 9:0] joystick1_cpu     = joystick1;
+wire [ 9:0] joystick2_cpu     = joystick2;
+wire [ 9:0] joystick3_cpu     = joystick3;
+wire [ 9:0] joystick4_cpu     = joystick4;
+wire [ 3:0] cab_1p_cpu        = cab_1p;
+wire [ 3:0] coin_cpu          = coin;
+wire [ 1:0] dial_x_cpu        = dial_x;
+wire [ 1:0] dial_y_cpu        = dial_y;
+wire [ 1:0] joymode_cpu       = joymode;
+wire        service_cpu       = service;
+wire        dip_test_cpu      = dip_test;
+wire        dip_pause_cpu     = dip_pause;
+wire        skip_en_cpu       = skip_en;
+`endif
+
 wire [ 1:0] dsn;
 wire        cen16, cen16b, cen12, cen8, cen10b;
 wire        cpu_cen, cpu_cenb;
@@ -83,8 +153,10 @@ assign skip_en  = status[7];
 assign snd_vu   = 0;
 assign snd_peak = 0;
 
+`ifndef JTFRAME_MEMGEN
 assign ba1_din=0, ba2_din=0, ba3_din=0,
        ba1_dsn=3, ba2_dsn=3, ba3_dsn=3;
+`endif
 /* verilator tracing_off */
 // CPU clock enable signals come from 48MHz domain
 jtframe_cen48 u_cen48(
@@ -129,7 +201,7 @@ jtcps2_main u_main(
     .V          ( vdump             ),
     .LVBL       ( LVBL              ),
     .LHBL       ( LHBL              ),
-    .skip_en    ( skip_en           ),
+    .skip_en    ( skip_en_cpu       ),
     // PPU
     .ppu1_cs    ( ppu1_cs           ),
     .ppu2_cs    ( ppu2_cs           ),
@@ -150,21 +222,21 @@ jtcps2_main u_main(
     .main2qs_waitn( main_waitn      ),
     .UDSWn      ( dsn[1]            ),
     .LDSWn      ( dsn[0]            ),
-    .volume     ( volume            ),
+    .volume     ( volume_cpu        ),
     // cabinet I/O
     // Cabinet input
-    .cab_1p      ( cab_1p           ),
-    .coin        ( coin             ),
-    .joymode     ( joymode          ),
-    .joystick1   ( joystick1        ),
-    .joystick2   ( joystick2        ),
-    .joystick3   ( joystick3        ),
-    .joystick4   ( joystick4        ),
-    .service     ( service          ),
+    .cab_1p      ( cab_1p_cpu       ),
+    .coin        ( coin_cpu         ),
+    .joymode     ( joymode_cpu      ),
+    .joystick1   ( joystick1_cpu    ),
+    .joystick2   ( joystick2_cpu    ),
+    .joystick3   ( joystick3_cpu    ),
+    .joystick4   ( joystick4_cpu    ),
+    .service     ( service_cpu      ),
     .tilt        ( 1'b1             ),
-    .dipsw       ( dipsw            ),
-    .dial_x      ( dial_x           ),
-    .dial_y      ( dial_y           ),
+    .dipsw       ( dipsw_cpu        ),
+    .dial_x      ( dial_x_cpu       ),
+    .dial_y      ( dial_y_cpu       ),
     // BUS sharing
     .busreq      ( busreq_cpu       ),
     .busack      ( busack_cpu       ),
@@ -177,16 +249,16 @@ jtcps2_main u_main(
     .oram_cs     ( main_oram_cs     ),
     .obank       ( obank            ),
     .oram_base   ( oram_base        ),
-    .ram_data    ( main_ram_data    ),
-    .ram_ok      ( main_ram_ok      ),
+    .ram_data    ( main_ram_data_cpu),
+    .ram_ok      ( main_ram_ok_cpu  ),
     // ROM access
     .rom_cs      ( main_rom_cs      ),
     .rom_addr    ( main_rom_addr    ),
-    .rom_data    ( main_rom_data    ),
-    .rom_ok      ( main_rom_ok      ),
+    .rom_data    ( main_rom_data_cpu),
+    .rom_ok      ( main_rom_ok_cpu  ),
     // DIP switches
-    .dip_pause   ( dip_pause        ),
-    .dip_test    ( dip_test         ),
+    .dip_pause   ( dip_pause_cpu    ),
+    .dip_test    ( dip_test_cpu     ),
     // EEPROM
     .eeprom_sclk ( sclk             ),
     .eeprom_sdi  ( sdi              ),
@@ -381,7 +453,11 @@ jtcps15_sound u_sound(
     .qsnd_ok    ( qsnd_ok           ),
 
     // ROM programming interface
+`ifdef JTFRAME_MEMGEN
+    .prog_addr  ( cps_prog_addr[12:0] ),
+`else
     .prog_addr  ( prog_addr[12:0]   ),
+`endif
     .prog_data  ( prog_data[7:0]    ),
     .prog_we    ( prog_qsnd         ),
 
@@ -400,6 +476,138 @@ jtcps15_sound u_sound(
     assign qsnd_addr = 0;
 `endif
 /* verilator tracing_on */
+`ifdef JTFRAME_MEMGEN
+jtcps1_memgen #(.CPS(2), .REGSIZE(REGSIZE)) u_memgen (
+    .rst            ( rst_sdram       ),
+    .clk            ( clk             ),
+    .hold_rst       ( hold_rst        ),
+
+    .ioctl_rom      ( ioctl_rom       ),
+    .ioctl_addr     ( ioctl_addr      ),
+    .ioctl_dout     ( ioctl_dout      ),
+    .ioctl_wr       ( ioctl_wr        ),
+    .ioctl_ram      ( ioctl_ram       ),
+    .ioctl_din      ( ioctl_din       ),
+
+    .prog_data      ( prog_data       ),
+    .prog_rdy       ( prog_rdy        ),
+    .post_addr      ( cps_post_addr   ),
+    .post_data      ( cps_post_data   ),
+    .post_ba        ( cps_post_ba     ),
+    .post_mask      ( cps_post_mask   ),
+    .post_we        ( cps_post_we     ),
+    .cps_prog_addr  ( cps_prog_addr   ),
+    .cfg_we         ( cfg_we          ),
+    .prog_qsnd      ( prog_qsnd       ),
+    .kabuki_we      (                 ),
+    .cps2_key_we    ( key_we          ),
+    .cps2_joymode   ( joymode         ),
+
+    .sclk           ( sclk            ),
+    .sdi            ( sdi             ),
+    .sdo            ( sdo             ),
+    .scs            ( scs             ),
+    .dump_flag      (                 ),
+
+    .main_rom_cs    ( main_rom_cs     ),
+    .main_rom_ok    ( main_rom_ok     ),
+    .main_rom_addr  ( main_rom_addr   ),
+    .main_rom_data  ( main_rom_data   ),
+
+    .vram_dma_cs    ( vram_dma_cs     ),
+    .vram_clr       ( vram_clr        ),
+    .main_ram_cs    ( main_ram_cs     ),
+    .main_vram_cs   ( main_vram_cs    ),
+    .main_oram_cs   ( main_oram_cs    ),
+    .obank          ( obank           ),
+    .gfx_oram_addr  ( gfx_oram_addr   ),
+    .gfx_oram_data  ( gfx_oram_data   ),
+    .gfx_oram_ok    ( gfx_oram_ok     ),
+    .gfx_oram_clr   ( gfx_oram_clr    ),
+    .gfx_oram_cs    ( gfx_oram_cs     ),
+    .dsn            ( dsn             ),
+    .main_dout      ( main_dout       ),
+    .main_rnw       ( main_rnw        ),
+    .main_ram_ok    ( main_ram_ok     ),
+    .vram_dma_ok    ( vram_dma_ok     ),
+    .main_ram_addr  ( ram_addr        ),
+    .vram_dma_addr  ( vram_dma_addr   ),
+    .main_ram_data  ( main_ram_data   ),
+    .vram_dma_data  ( vram_dma_data   ),
+
+    .snd_cs         ( snd_cs          ),
+    .pcm_cs         ( qsnd_cs         ),
+    .snd_ok         ( snd_ok          ),
+    .pcm_ok         ( qsnd_ok         ),
+    .snd_addr       ( snd_addr        ),
+    .pcm_addr       ( qsnd_addr       ),
+    .snd_data       ( snd_data        ),
+    .pcm_data       ( qsnd_data       ),
+
+    .rom0_cs        ( rom0_cs         ),
+    .rom1_cs        ( rom1_cs         ),
+    .rom0_ok        ( rom0_ok         ),
+    .rom1_ok        ( rom1_ok         ),
+    .rom0_addr      ( rom0_addr       ),
+    .rom0_bank      ( rom0_bank       ),
+    .rom1_addr      ( rom1_addr       ),
+    .rom0_half      ( rom0_half       ),
+    .rom1_half      ( rom1_half       ),
+    .rom0_data      ( rom0_data       ),
+    .rom1_data      ( rom1_data       ),
+
+    .workram_cs     ( workram_cs      ),
+    .workram_addr   ( workram_addr    ),
+    .workram_data   ( workram_data    ),
+    .workram_ok     ( workram_ok      ),
+    .workram_we     ( workram_we      ),
+    .workram_din    ( workram_din     ),
+    .workram_dsn    ( workram_dsn     ),
+    .workram_offset ( workram_offset  ),
+
+    .vramrom_cs     ( vramrom_cs      ),
+    .vramrom_addr   ( vramrom_addr    ),
+    .vramrom_data   ( vramrom_data    ),
+    .vramrom_ok     ( vramrom_ok      ),
+    .vramrom_clr    ( vramrom_clr     ),
+
+    .oramrom_cs     ( oramrom_cs      ),
+    .oramrom_addr   ( oramrom_addr    ),
+    .oramrom_data   ( oramrom_data    ),
+    .oramrom_ok     ( oramrom_ok      ),
+    .oramrom_clr    ( oramrom_clr     ),
+
+    .mainrom_cs     ( mainrom_cs      ),
+    .mainrom_addr   ( mainrom_addr    ),
+    .mainrom_data   ( mainrom_data    ),
+    .mainrom_ok     ( mainrom_ok      ),
+
+    .sndrom_cs      ( sndrom_cs       ),
+    .sndrom_addr    ( sndrom_addr     ),
+    .sndrom_data    ( sndrom_data     ),
+    .sndrom_ok      ( sndrom_ok       ),
+
+    .pcmrom_cs      ( pcmrom_cs       ),
+    .pcmrom_addr    ( pcmrom_addr     ),
+    .pcmrom_data    ( pcmrom_data     ),
+    .pcmrom_ok      ( pcmrom_ok       ),
+
+    .objlorom_cs    ( objlorom_cs     ),
+    .objlorom_addr  ( objlorom_addr   ),
+    .objlorom_data  ( objlorom_data   ),
+    .objlorom_ok    ( objlorom_ok     ),
+
+    .objrom_cs      ( objrom_cs       ),
+    .objrom_addr    ( objrom_addr     ),
+    .objrom_data    ( objrom_data     ),
+    .objrom_ok      ( objrom_ok       ),
+
+    .scrrom_cs      ( scrrom_cs       ),
+    .scrrom_addr    ( scrrom_addr     ),
+    .scrrom_data    ( scrrom_data     ),
+    .scrrom_ok      ( scrrom_ok       )
+);
+`else
 jtcps1_sdram #(.CPS(2), .REGSIZE(REGSIZE)) u_sdram (
     .rst         ( rst_sdram     ),
     .clk         ( clk           ),
@@ -531,5 +739,6 @@ jtcps1_sdram #(.CPS(2), .REGSIZE(REGSIZE)) u_sdram (
 
     .data_read   ( data_read     )
 );
+`endif
 
 endmodule

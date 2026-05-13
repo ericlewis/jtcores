@@ -61,13 +61,16 @@ jtframe:
   - from: video
     get:
       - jtframe_resync.v
-      - jtframe_credits.v
       - jtframe_wirebw.v
       - jtframe_short_blank.v
       - jtframe_video_counter.v
       - jtframe_blank_length.v
       - jtframe_font.v
       - jtframe_blank.v
+  - from: video
+    unless: [ POCKET ]
+    get:
+      - jtframe_credits.v
   - from: video/crosshair
     get:
       - jtframe_crosshair_disable.v

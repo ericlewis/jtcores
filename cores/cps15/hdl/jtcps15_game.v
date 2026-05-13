@@ -28,6 +28,7 @@ wire        HB, VB;
 wire [18:0] snd_addr;
 wire [22:0] qsnd_addr;
 wire        prog_qsnd;
+wire [22:0] cps_prog_addr;
 wire [ 7:0] snd_data, qsnd_data;
 wire [17:1] ram_addr;
 wire [21:1] main_rom_addr;
@@ -65,6 +66,69 @@ wire        main2qs_cs, main_busakn, main_waitn;
 // EEPROM
 wire        sclk, sdi, sdo, scs;
 
+`ifdef JTFRAME_MEMGEN
+`ifdef JTFRAME_SDRAM_LARGE
+wire [22:0] cps_post_addr;
+`else
+wire [21:0] cps_post_addr;
+`endif
+wire [ 7:0] cps_post_data;
+wire [ 1:0] cps_post_ba;
+wire [ 1:0] cps_post_mask;
+wire        cps_post_we;
+
+always @(*) begin
+    post_addr = cps_post_addr;
+    post_data = cps_post_data;
+    post_ba   = cps_post_ba;
+    post_mask = cps_post_mask;
+    post_we   = cps_post_we;
+end
+
+wire [15:0] main_ram_data_cpu = main_ram_data;
+wire [15:0] main_rom_data_cpu = main_rom_data;
+wire        main_ram_ok_cpu   = main_ram_ok;
+wire        main_rom_ok_cpu   = main_rom_ok;
+reg [ 9:0] joystick1_cpu, joystick2_cpu, joystick3_cpu, joystick4_cpu;
+reg [ 3:0] cab_1p_cpu, coin_cpu;
+reg [ 7:0] dipsw_a_cpu, dipsw_b_cpu, dipsw_c_cpu;
+reg        charger_cpu, service_cpu, dip_test_cpu, dip_pause_cpu;
+
+always @(posedge clk48) begin
+    joystick1_cpu     <= joystick1;
+    joystick2_cpu     <= joystick2;
+    joystick3_cpu     <= joystick3;
+    joystick4_cpu     <= joystick4;
+    cab_1p_cpu        <= cab_1p;
+    coin_cpu          <= coin;
+    dipsw_a_cpu       <= dipsw_a;
+    dipsw_b_cpu       <= dipsw_b;
+    dipsw_c_cpu       <= dipsw_c;
+    charger_cpu       <= charger;
+    service_cpu       <= service;
+    dip_test_cpu      <= dip_test;
+    dip_pause_cpu     <= dip_pause;
+end
+`else
+wire [15:0] main_ram_data_cpu = main_ram_data;
+wire [15:0] main_rom_data_cpu = main_rom_data;
+wire        main_ram_ok_cpu   = main_ram_ok;
+wire        main_rom_ok_cpu   = main_rom_ok;
+wire [ 9:0] joystick1_cpu     = joystick1;
+wire [ 9:0] joystick2_cpu     = joystick2;
+wire [ 9:0] joystick3_cpu     = joystick3;
+wire [ 9:0] joystick4_cpu     = joystick4;
+wire [ 3:0] cab_1p_cpu        = cab_1p;
+wire [ 3:0] coin_cpu          = coin;
+wire [ 7:0] dipsw_a_cpu       = dipsw_a;
+wire [ 7:0] dipsw_b_cpu       = dipsw_b;
+wire [ 7:0] dipsw_c_cpu       = dipsw_c;
+wire        charger_cpu       = charger;
+wire        service_cpu       = service;
+wire        dip_test_cpu      = dip_test;
+wire        dip_pause_cpu     = dip_pause;
+`endif
+
 assign { dipsw_c, dipsw_b, dipsw_a } = ~24'd0;
 assign snd_peak = 0;
 
@@ -78,8 +142,10 @@ reg         rst_game;
 
 assign snd_vu     = 0;
 assign debug_view = 0;
+`ifndef JTFRAME_MEMGEN
 assign ba1_din=0, ba2_din=0, ba3_din=0,
        ba1_dsn=3, ba2_dsn=3, ba3_dsn=3;
+`endif
 
 // CPU clock enable signals come from 48MHz domain
 /* verilator lint_off PINMISSING */
@@ -141,16 +207,16 @@ jtcps1_main u_main(
     .LDSWn      ( dsn[0]            ),
     // cabinet I/O
     // Cabinet input
-    .charger     ( charger          ),
-    .cab_1p      ( cab_1p           ),
-    .coin        ( coin             ),
-    .joystick1   ( joystick1        ),
-    .joystick2   ( joystick2        ),
-    .joystick3   ( joystick3        ),
-    .joystick4   ( joystick4        ),
+    .charger     ( charger_cpu      ),
+    .cab_1p      ( cab_1p_cpu       ),
+    .coin        ( coin_cpu         ),
+    .joystick1   ( joystick1_cpu    ),
+    .joystick2   ( joystick2_cpu    ),
+    .joystick3   ( joystick3_cpu    ),
+    .joystick4   ( joystick4_cpu    ),
     .dial_x      ( 2'd0             ),
     .dial_y      ( 2'd0             ),
-    .service     ( service          ),
+    .service     ( service_cpu      ),
     .tilt        ( 1'b1             ),
     // BUS sharing
     .busreq      ( busreq_cpu       ),
@@ -161,19 +227,19 @@ jtcps1_main u_main(
     .cpu_dout    ( main_dout        ),
     .ram_cs      ( main_ram_cs      ),
     .vram_cs     ( main_vram_cs     ),
-    .ram_data    ( main_ram_data    ),
-    .ram_ok      ( main_ram_ok      ),
+    .ram_data    ( main_ram_data_cpu),
+    .ram_ok      ( main_ram_ok_cpu  ),
     // ROM access
     .rom_cs      ( main_rom_cs      ),
     .rom_addr    ( main_rom_addr    ),
-    .rom_data    ( main_rom_data    ),
-    .rom_ok      ( main_rom_ok      ),
+    .rom_data    ( main_rom_data_cpu),
+    .rom_ok      ( main_rom_ok_cpu  ),
     // DIP switches
-    .dip_pause   ( dip_pause        ),
-    .dip_test    ( dip_test         ),
-    .dipsw_a     ( dipsw_a          ),
-    .dipsw_b     ( dipsw_b          ),
-    .dipsw_c     ( dipsw_c          ),
+    .dip_pause   ( dip_pause_cpu    ),
+    .dip_test    ( dip_test_cpu     ),
+    .dipsw_a     ( dipsw_a_cpu      ),
+    .dipsw_b     ( dipsw_b_cpu      ),
+    .dipsw_c     ( dipsw_c_cpu      ),
     // EEPROM
     .eeprom_sclk ( sclk             ),
     .eeprom_sdi  ( sdi              ),
@@ -331,7 +397,11 @@ jtcps15_sound u_sound(
     .qsnd_ok    ( qsnd_ok           ),
 
     // ROM programming interface
+`ifdef JTFRAME_MEMGEN
+    .prog_addr  ( cps_prog_addr[12:0] ),
+`else
     .prog_addr  ( prog_addr[12:0]   ),
+`endif
     .prog_data  ( prog_data[7:0]    ),
     .prog_we    ( prog_qsnd         ),
 
@@ -348,6 +418,121 @@ assign qsnd_cs = 0;
 assign qsnd_addr = 0;
 `endif
 
+`ifdef JTFRAME_MEMGEN
+jtcps1_memgen #(.CPS(15), .REGSIZE(REGSIZE)) u_memgen (
+    .rst            ( rst_sdram       ),
+    .clk            ( clk             ),
+    .hold_rst       ( hold_rst        ),
+
+    .ioctl_rom      ( ioctl_rom       ),
+    .ioctl_addr     ( ioctl_addr      ),
+    .ioctl_dout     ( ioctl_dout      ),
+    .ioctl_wr       ( ioctl_wr        ),
+    .ioctl_ram      ( ioctl_ram       ),
+    .ioctl_din      ( ioctl_din       ),
+
+    .prog_data      ( prog_data       ),
+    .prog_rdy       ( prog_rdy        ),
+    .post_addr      ( cps_post_addr   ),
+    .post_data      ( cps_post_data   ),
+    .post_ba        ( cps_post_ba     ),
+    .post_mask      ( cps_post_mask   ),
+    .post_we        ( cps_post_we     ),
+    .cps_prog_addr  ( cps_prog_addr   ),
+    .cfg_we         ( cfg_we          ),
+    .prog_qsnd      ( prog_qsnd       ),
+    .kabuki_we      ( kabuki_we       ),
+    .cps2_key_we    (                 ),
+    .cps2_joymode   (                 ),
+
+    .sclk           ( sclk            ),
+    .sdi            ( sdi             ),
+    .sdo            ( sdo             ),
+    .scs            ( scs             ),
+    .dump_flag      (                 ),
+
+    .main_rom_cs    ( main_rom_cs     ),
+    .main_rom_ok    ( main_rom_ok     ),
+    .main_rom_addr  ( main_rom_addr   ),
+    .main_rom_data  ( main_rom_data   ),
+
+    .vram_dma_cs    ( vram_dma_cs     ),
+    .vram_clr       ( vram_clr        ),
+    .main_ram_cs    ( main_ram_cs     ),
+    .main_vram_cs   ( main_vram_cs    ),
+    .main_oram_cs   ( 1'b0            ),
+    .dsn            ( dsn             ),
+    .main_dout      ( main_dout       ),
+    .main_rnw       ( main_rnw        ),
+    .main_ram_ok    ( main_ram_ok     ),
+    .vram_dma_ok    ( vram_dma_ok     ),
+    .main_ram_addr  ( ram_addr        ),
+    .vram_dma_addr  ( vram_dma_addr   ),
+    .main_ram_data  ( main_ram_data   ),
+    .vram_dma_data  ( vram_dma_data   ),
+
+    .snd_cs         ( snd_cs          ),
+    .pcm_cs         ( qsnd_cs         ),
+    .snd_ok         ( snd_ok          ),
+    .pcm_ok         ( qsnd_ok         ),
+    .snd_addr       ( snd_addr        ),
+    .pcm_addr       ( qsnd_addr       ),
+    .snd_data       ( snd_data        ),
+    .pcm_data       ( qsnd_data       ),
+
+    .rom0_cs        ( rom0_cs         ),
+    .rom1_cs        ( rom1_cs         ),
+    .rom0_ok        ( rom0_ok         ),
+    .rom1_ok        ( rom1_ok         ),
+    .rom0_addr      ( rom0_addr       ),
+    .rom0_bank      ( 2'd0            ),
+    .rom1_addr      ( rom1_addr       ),
+    .rom0_half      ( rom0_half       ),
+    .rom1_half      ( rom1_half       ),
+    .rom0_data      ( rom0_data       ),
+    .rom1_data      ( rom1_data       ),
+
+    .workram_cs     ( workram_cs      ),
+    .workram_addr   ( workram_addr    ),
+    .workram_data   ( workram_data    ),
+    .workram_ok     ( workram_ok      ),
+    .workram_we     ( workram_we      ),
+    .workram_din    ( workram_din     ),
+    .workram_dsn    ( workram_dsn     ),
+    .workram_offset ( workram_offset  ),
+
+    .vramrom_cs     ( vramrom_cs      ),
+    .vramrom_addr   ( vramrom_addr    ),
+    .vramrom_data   ( vramrom_data    ),
+    .vramrom_ok     ( vramrom_ok      ),
+    .vramrom_clr    ( vramrom_clr     ),
+
+    .mainrom_cs     ( mainrom_cs      ),
+    .mainrom_addr   ( mainrom_addr    ),
+    .mainrom_data   ( mainrom_data    ),
+    .mainrom_ok     ( mainrom_ok      ),
+
+    .sndrom_cs      ( sndrom_cs       ),
+    .sndrom_addr    ( sndrom_addr     ),
+    .sndrom_data    ( sndrom_data     ),
+    .sndrom_ok      ( sndrom_ok       ),
+
+    .pcmrom_cs      ( pcmrom_cs       ),
+    .pcmrom_addr    ( pcmrom_addr     ),
+    .pcmrom_data    ( pcmrom_data     ),
+    .pcmrom_ok      ( pcmrom_ok       ),
+
+    .objrom_cs      ( objrom_cs       ),
+    .objrom_addr    ( objrom_addr     ),
+    .objrom_data    ( objrom_data     ),
+    .objrom_ok      ( objrom_ok       ),
+
+    .scrrom_cs      ( scrrom_cs       ),
+    .scrrom_addr    ( scrrom_addr     ),
+    .scrrom_data    ( scrrom_data     ),
+    .scrrom_ok      ( scrrom_ok       )
+);
+`else
 wire nc0, nc1, nc2, nc3, nc4;
 
 jtcps1_sdram #(.CPS(15), .REGSIZE(REGSIZE)) u_sdram (
@@ -475,5 +660,6 @@ jtcps1_sdram #(.CPS(15), .REGSIZE(REGSIZE)) u_sdram (
     .cps2_joymode (              ),
     .dump_flag    (              )
 );
+`endif
 
 endmodule

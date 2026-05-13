@@ -14,3 +14,4 @@ jtframe:
     get:
       - jtframe_8x8x4_packed_msb.v
 jt539:
+  - unless: [NOSOUND]

@@ -16,9 +16,8 @@ EOF
 	exit 1
 fi
 cd modules/jtframe/target
-git submodule update pocket
 rm -f ../src/jtframe/jtframe
-jtframe 
+jtframe
 jtframe mra $CORE; jtcore $CORE $*; jtbin2sd
 echo "Good y/n?"
 read RSLT

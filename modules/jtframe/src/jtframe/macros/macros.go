@@ -102,6 +102,7 @@ func MakeMacros(core, target string, extra ...string) {
 	add_credits_for_releases(core) // credits must come before parse_def
 	core_def := ConfigFilePath(core, "macros.def")
 	parse_def(core_def, target)
+	disable_credits_for_target(target)
 	mem_managed := is_mem_managed(core)
 	set_separator(target)
 	// Adds a macro with the target name
@@ -355,6 +356,12 @@ func add_credits_for_releases(core string) {
 	msgpath := ConfigFilePath(core, "msg")
 	if FileExists(msgpath) {
 		Set(JTFRAME_CREDITS, "1")
+	}
+}
+
+func disable_credits_for_target(target string) {
+	if strings.EqualFold(target, "pocket") {
+		Remove(JTFRAME_CREDITS)
 	}
 }
 

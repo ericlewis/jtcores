@@ -114,6 +114,11 @@ localparam BURSTLEN=(BA0_LEN>32 || BA1_LEN>32 ||BA2_LEN>32 ||BA3_LEN>32) ? 64 :(
                     (BA0_LEN>16 || BA1_LEN>16 ||BA2_LEN>16 ||BA3_LEN>16) ? 32 : 16);
 
 localparam LATCH = HF==1;
+`ifdef JTFRAME_POCKET_PROG_SINGLE_BEAT
+localparam PROG_SINGLE_BEAT = 1;
+`else
+localparam PROG_SINGLE_BEAT = 0;
+`endif
 
 //                             /CS /RAS /CAS /WE
 localparam CMD_LOAD_MODE   = 4'b0___0____0____0, // 0
@@ -154,6 +159,7 @@ reg         rfsh_bg;
 reg  [ 1:0] dqm;
 wire [ 1:0] mask_mux;
 wire        all_dqm, prog_busy, pre_br;
+wire        mask_extra_prog_beat;
 
 assign {sdram_ncs, sdram_nras, sdram_ncas, sdram_nwe } = cmd;
 assign {sdram_dqmh, sdram_dqml} = MISTER ? sdram_a[12:11] : dqm;
@@ -161,6 +167,7 @@ assign sdram_cke = 1;
 assign all_act     = |post_act;
 assign all_dqm     = |dqm_busy;
 assign wr_cycle    = |wr_busy;
+assign mask_extra_prog_beat = PROG_SINGLE_BEAT && prog_en && (PROG_LEN < BURSTLEN) && prog_busy && !wr_cycle;
 
 assign {next_ba, next_cmd, next_a } =
                         init ? { 2'd0, init_cmd, init_a } : (
@@ -232,7 +239,7 @@ always @(posedge clk) begin
             sdram_a[12:11] <= wr_cycle ? mask_mux : 2'd0;
     end else begin
         sdram_a[12:11] <= next_a[12:11];
-        dqm <= wr_cycle ? mask_mux : 2'd0;
+        dqm <= wr_cycle ? mask_mux : (mask_extra_prog_beat ? 2'b11 : 2'd0);
     end
 end
 

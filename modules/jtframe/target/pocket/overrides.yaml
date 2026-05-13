@@ -1,0 +1,266 @@
+# Pocket target-owned metadata overrides.
+#
+# Use this file for Pocket packaging/scaler policy that is learned during
+# hardware bring-up but should not become a scattered core-local cfg hack. Keep
+# true portable core facts in cores/*/cfg, and keep HDL/fitter-only fixes in
+# cores/*/pocket or cores/*/syn/pocket.qsf.
+#
+# Keys may be the source core name, the JT shortname without "jt", or the full
+# JT shortname. Each entry must include a reason so overrides stay auditable.
+cores:
+  rumble:
+    reason: "Local Pocket package uses a single 352x240 4:3 rot90 mode; hardware showed the generated 5:4/dual-rotation metadata starts with the wrong size/orientation."
+    video:
+      scaler_modes:
+        - width: 352
+          height: 240
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0
+  shouse:
+    reason: "Local Pocket package provides explicit 288/272/256 crop modes; generated dual-mode metadata made rotation/crop selection unreliable on hardware."
+    video:
+      scaler_modes:
+        - width: 288
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 0
+          mirror: 0
+        - width: 288
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 270
+          mirror: 0
+        - width: 288
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0
+        - width: 272
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 0
+          mirror: 0
+        - width: 272
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 270
+          mirror: 0
+        - width: 272
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0
+        - width: 256
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 0
+          mirror: 0
+        - width: 256
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 270
+          mirror: 0
+  s16:
+    reason: "Local Pocket package orders System 16 scaler modes with rot0 first and crop alternatives; generated coremod order made hardware boot upside down."
+    video:
+      scaler_modes:
+        - width: 320
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 0
+          mirror: 0
+        - width: 320
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 270
+          mirror: 0
+        - width: 320
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0
+        - width: 304
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 0
+          mirror: 0
+        - width: 304
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 270
+          mirror: 0
+        - width: 304
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0
+        - width: 288
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 0
+          mirror: 0
+        - width: 288
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 270
+          mirror: 0
+  roadf:
+    reason: "Local Pocket package exposes Road Fighter crop/orientation modes explicitly; hardware still shows tile-map/crop artifacts with generated two-mode metadata."
+    video:
+      scaler_modes:
+        - width: 256
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 0
+          mirror: 0
+        - width: 256
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 270
+          mirror: 0
+        - width: 256
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0
+        - width: 240
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 0
+          mirror: 0
+        - width: 240
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 270
+          mirror: 0
+        - width: 240
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0
+        - width: 224
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 0
+          mirror: 0
+        - width: 224
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 270
+          mirror: 0
+  castle:
+    reason: "Pocket sim measures a stable 280x224 APF stream matching JTFRAME_WIDTH; the earlier 264-wide override mismatched DE and did not explain the hardware squashing."
+    video:
+      scaler_modes:
+        - width: 280
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 0
+          mirror: 0
+  comsc:
+    reason: "Pocket sim measures a stable 280x224 APF stream, matching JTFRAME_WIDTH; the earlier 264-wide override mismatched DE and did not explain the hardware one-line symptom."
+    video:
+      scaler_modes:
+        - width: 280
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 0
+          mirror: 0
+  commnd:
+    reason: "Local Pocket package uses a single 256x224 4:3 rot90 mode; generated 5:4/dual-rotation metadata boots upside down and rotate does not recover it."
+    video:
+      scaler_modes:
+        - width: 256
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0
+  exed:
+    reason: "Local Pocket package uses a single 256x224 4:3 rot90 mode; keep Pocket orientation policy target-local."
+    video:
+      scaler_modes:
+        - width: 256
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0
+  kchamp:
+    reason: "Local Pocket package uses a single 256x224 4:3 rot90 mode; hardware booted upside down with generated dual-rotation metadata."
+    video:
+      scaler_modes:
+        - width: 256
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0
+  kicker:
+    reason: "Local Pocket package uses a single 256x224 4:3 rot90 mode; hardware showed tile-map/orientation symptoms with generated dual-rotation metadata."
+    video:
+      scaler_modes:
+        - width: 256
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0
+  mikie:
+    reason: "Local Pocket package uses a single 256x224 4:3 rot90 mode; hardware booted upside down and rotate did not recover generated dual-rotation metadata."
+    video:
+      scaler_modes:
+        - width: 256
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0
+  roc:
+    reason: "Local Pocket package uses a single 256x224 4:3 rot90 mode; hardware booted upside down and rotate did not recover generated dual-rotation metadata."
+    video:
+      scaler_modes:
+        - width: 256
+          height: 224
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0
+  cal50:
+    reason: "Local Pocket package uses a single 376x240 4:3 rot90 mode; hardware slot metadata is now validated, so keep scaler policy aligned with the reference package."
+    video:
+      scaler_modes:
+        - width: 376
+          height: 240
+          aspect_w: 4
+          aspect_h: 3
+          rotation: 90
+          mirror: 0

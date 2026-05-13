@@ -208,6 +208,24 @@ func writeable(bus Bus) bool       { return bus.Is_wr() }
 func is_nbits(bus Bus, n int) bool { return bus.Is_nbits(n) }
 func byte_en_width(dw int) int     { return dw >> 3 }
 
+func is_simple_identifier(name string) bool {
+	if name == "" {
+		return false
+	}
+	for k, r := range name {
+		if k == 0 {
+			if !(r == '_' || r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z') {
+				return false
+			}
+			continue
+		}
+		if !(r == '_' || r >= 'A' && r <= 'Z' || r >= 'a' && r <= 'z' || r >= '0' && r <= '9') {
+			return false
+		}
+	}
+	return true
+}
+
 var funcMap = template.FuncMap{
 	"addr_range":            addr_range,
 	"cache_line_aw":         cache_line_aw,
@@ -887,6 +905,10 @@ func (cfg *MemConfig) check_bram() error {
 
 func fill_implicit_ports(cfg *MemConfig) {
 	implicit := make(map[string]bool)
+	params := make(map[string]bool)
+	for _, each := range cfg.Params {
+		params[each.Name] = true
+	}
 	// get implicit names
 	for _, bank := range cfg.SDRAM.Banks {
 		for _, each := range bank.Buses {
@@ -955,6 +977,12 @@ func fill_implicit_ports(cfg *MemConfig) {
 			}
 			if each.Din != "" {
 				add(Port{Name: each.Din, MSB: each.Data_width - 1})
+			}
+			if each.Clr != "" {
+				add(Port{Name: each.Clr})
+			}
+			if is_simple_identifier(each.Offset) && !params[each.Offset] {
+				add(Port{Name: each.Offset, MSB: 22})
 			}
 		}
 	}

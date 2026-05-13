@@ -20,13 +20,13 @@ jtframe:
   - from: cpu
     unless: [NOMAIN]
     get:
-      - jtframe_m68k.yaml   
+      - jtframe_m68k.yaml
   - from: cpu
     get:
       - jtframe_z80.yaml
   - from: video
     get:
-      - jtframe_obj.yaml      
+      - jtframe_obj.yaml
   - from: video/layouts
     get:
       - jtframe_8x8x4_packed_msb.v
@@ -41,6 +41,7 @@ jtframe:
     get:
       - jtframe_crossclk_cen.v
 jt539:
+  - unless: [NOSOUND]
 jteeprom:
   - get:
     - jt5911.sv

@@ -204,12 +204,14 @@ jt054321 u_54321(
     .int_n      ( latch_intn)
 );
 `else
-assign  main_din = 0;
 assign  pcm_addr = 0;
 assign  pcm_cs   = 0;
 assign  rom_addr = 0;
 assign  st_dout  = 0;
-initial rom_cs   = 0;
-assign  { pair_dout, fm_l, fm_r, k539_l, k539_r } = 0;
+assign  { pair_dout, k539_l, k539_r } = 0;
+
+always @* begin
+    rom_cs = 0;
+end
 `endif
 endmodule
